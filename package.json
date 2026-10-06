@@ -1,0 +1,14 @@
+{
+  "name": "pantrypal-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "PantryPal Monorepo - Smart Grocery Delivery & Expiry Reminder System",
+  "scripts": {
+    "install:all": "npm install --prefix backend && npm install --prefix customer-app && npm install --prefix delivery-app && npm install --prefix admin-panel",
+    "start:backend": "npm --prefix backend run start",
+    "seed:backend": "npm --prefix backend run seed",
+    "start:customer": "npm --prefix customer-app run dev",
+    "start:delivery": "npm --prefix delivery-app run dev",
+    "start:admin": "npm --prefix admin-panel run dev"
+  }
+}
