@@ -20,6 +20,7 @@ import DeliveryPartnerScreen from '../screens/DeliveryPartnerScreen';
 import ProfileScreen from '../screens/ProfileScreen';
 import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
+import SplashScreen from '../screens/SplashScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -124,12 +125,13 @@ const MainTabs = () => {
 const AppNavigator = () => {
   return (
     <Stack.Navigator
-      initialRouteName="Main"
+      initialRouteName="Splash"
       screenOptions={{
         headerShown: false,
-        animation: 'slide_from_right',
+        animation: 'fade',
       }}
     >
+      <Stack.Screen name="Splash" component={SplashScreen} />
       <Stack.Screen name="Main" component={MainTabs} />
       <Stack.Screen name="ProductDetails" component={ProductDetailsScreen} />
       <Stack.Screen name="Categories" component={CategoriesScreen} />
