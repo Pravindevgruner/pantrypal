@@ -57,7 +57,8 @@ const HouseholdPantryScreen = ({ navigation }) => {
     try {
       setLoading(true);
       const res = await expiryAPI.getExpiryItems();
-      setItems(res.data?.items || res.data || []);
+      const rawList = res.data?.data?.items || res.data?.items || (Array.isArray(res.data) ? res.data : []);
+      setItems(Array.isArray(rawList) ? rawList : []);
     } catch (err) {
       console.warn('Failed to load household pantry:', err);
     } finally {

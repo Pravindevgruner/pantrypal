@@ -37,13 +37,15 @@ const HomeScreen = ({ navigation }) => {
         productAPI.getCategories(),
       ]);
 
-      setProducts(prodRes.data?.products || prodRes.data || []);
-      setCategories(catRes.data?.categories || catRes.data || []);
+      const pList = prodRes.data?.data?.products || prodRes.data?.products || (Array.isArray(prodRes.data) ? prodRes.data : []);
+      const cList = catRes.data?.data?.categories || catRes.data?.categories || (Array.isArray(catRes.data) ? catRes.data : []);
+      setProducts(Array.isArray(pList) ? pList : []);
+      setCategories(Array.isArray(cList) ? cList : []);
 
       if (isAuthenticated) {
         try {
           const expRes = await expiryAPI.getExpiringSoon();
-          const items = expRes.data?.items || expRes.data || [];
+          const items = expRes.data?.data?.items || expRes.data?.items || [];
           setExpiringCount(items.length);
         } catch (e) {
           // Expiry fetch fallback
@@ -62,10 +64,14 @@ const HomeScreen = ({ navigation }) => {
     loadData();
   };
 
-  const filteredProducts = products.filter((p) =>
-    (p.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (p.category || '').toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const productList = Array.isArray(products) ? products : [];
+  const filteredProducts = productList.filter((p) => {
+    const catName = typeof p.category === 'string' ? p.category : p.category?.name || '';
+    return (
+      (p.name || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      catName.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  });
 
   return (
     <View style={styles.container}>

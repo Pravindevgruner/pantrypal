@@ -24,3 +24,5 @@ yarn-error.log*
 .idea/
 *.swp
 *.swo
+local.properties
+android/local.properties

@@ -34,7 +34,8 @@ const DeliveryPartnerScreen = ({ navigation }) => {
       setLoading(true);
       // Delivery partners get orders assigned to them or active orders
       const res = await orderAPI.getOrders();
-      const allOrders = res.data?.orders || res.data || [];
+      const rawOrders = res.data?.data?.orders || res.data?.orders || (Array.isArray(res.data) ? res.data : []);
+      const allOrders = Array.isArray(rawOrders) ? rawOrders : [];
       // Filter orders relevant for delivery partner
       const deliveryOrders = allOrders.filter(
         (o) =>

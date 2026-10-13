@@ -37,7 +37,8 @@ const SmartExpiryScreen = ({ navigation }) => {
     try {
       setLoading(true);
       const res = await expiryAPI.getExpiryItems();
-      const list = res.data?.items || res.data || [];
+      const rawList = res.data?.data?.items || res.data?.items || (Array.isArray(res.data) ? res.data : []);
+      const list = Array.isArray(rawList) ? rawList : [];
       setItems(list);
 
       const total = list.length;

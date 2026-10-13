@@ -30,8 +30,10 @@ const CategoriesScreen = ({ navigation, route }) => {
         productAPI.getCategories(),
         productAPI.getProducts(),
       ]);
-      setCategories(catRes.data?.categories || catRes.data || []);
-      setProducts(prodRes.data?.products || prodRes.data || []);
+      const cList = catRes.data?.data?.categories || catRes.data?.categories || (Array.isArray(catRes.data) ? catRes.data : []);
+      const pList = prodRes.data?.data?.products || prodRes.data?.products || (Array.isArray(prodRes.data) ? prodRes.data : []);
+      setCategories(Array.isArray(cList) ? cList : []);
+      setProducts(Array.isArray(pList) ? pList : []);
     } catch (err) {
       console.warn('Failed to load categories:', err);
     } finally {
@@ -39,12 +41,14 @@ const CategoriesScreen = ({ navigation, route }) => {
     }
   };
 
+  const productList = Array.isArray(products) ? products : [];
   const filteredProducts =
     selectedCategory === 'ALL'
-      ? products
-      : products.filter(
-          (p) => (p.category || '').toLowerCase() === selectedCategory.toLowerCase()
-        );
+      ? productList
+      : productList.filter((p) => {
+          const catName = typeof p.category === 'string' ? p.category : p.category?.name || '';
+          return catName.toLowerCase() === selectedCategory.toLowerCase();
+        });
 
   return (
     <View style={styles.container}>

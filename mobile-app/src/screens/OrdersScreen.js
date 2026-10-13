@@ -32,7 +32,8 @@ const OrdersScreen = ({ navigation }) => {
     try {
       setLoading(true);
       const res = await orderAPI.getOrders();
-      setOrders(res.data?.orders || res.data || []);
+      const list = res.data?.data?.orders || res.data?.orders || (Array.isArray(res.data) ? res.data : []);
+      setOrders(Array.isArray(list) ? list : []);
     } catch (err) {
       console.warn('Failed to load orders:', err);
     } finally {
