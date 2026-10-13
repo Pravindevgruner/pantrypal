@@ -65,6 +65,7 @@ const HomeScreen = ({ navigation }) => {
   };
 
   const productList = Array.isArray(products) ? products : [];
+  const categoryList = Array.isArray(categories) ? categories : [];
   const filteredProducts = productList.filter((p) => {
     const catName = typeof p.category === 'string' ? p.category : p.category?.name || '';
     return (
@@ -165,7 +166,7 @@ const HomeScreen = ({ navigation }) => {
         </View>
 
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoriesRow}>
-          {categories.map((cat, idx) => (
+          {categoryList.map((cat, idx) => (
             <TouchableOpacity
               key={cat._id || idx}
               style={styles.catItem}

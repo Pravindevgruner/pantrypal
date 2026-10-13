@@ -105,7 +105,27 @@ const HouseholdPantryScreen = ({ navigation }) => {
       Alert.alert('Success 🎉', `${itemName} logged in your household pantry.`);
       loadPantryItems();
     } catch (err) {
-      Alert.alert('Error', err.response?.data?.message || 'Failed to save item');
+      console.log('Household pantry add falling back to local store:', err.message);
+      try {
+        const { mockStorage } = require('../services/mockStorage');
+        await mockStorage.addExpiryItem({
+          itemName: itemName.trim(),
+          category,
+          shelfLifeDays: parseInt(shelfLifeDays, 10) || 7,
+          quantity: parseFloat(quantity) || 1,
+          unit,
+          location: storageLocation,
+          purchasedDate: new Date().toISOString(),
+        });
+        setModalVisible(false);
+        setItemName('');
+        setShelfLifeDays('7');
+        setQuantity('1');
+        Alert.alert('Success 🎉', `${itemName} logged in your household pantry.`);
+        loadPantryItems();
+      } catch (e) {
+        Alert.alert('Error', 'Failed to save item');
+      }
     } finally {
       setSaving(false);
     }

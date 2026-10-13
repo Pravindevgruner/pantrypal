@@ -44,6 +44,11 @@ const ProductDetailsScreen = ({ navigation, route }) => {
     ? Math.round(((originalPrice - price) / originalPrice) * 100)
     : 0;
 
+  const categoryName = typeof product.category === 'string'
+    ? product.category
+    : product.categoryName || product.category?.name || 'Grocery';
+  const categoryStr = categoryName.toLowerCase();
+
   const handleAddToCart = () => {
     addToCart(product, quantity);
     Alert.alert('Added to Cart', `${quantity}x ${product.name} added to your basket.`);
@@ -66,14 +71,15 @@ const ProductDetailsScreen = ({ navigation, route }) => {
       setAddingToPantry(true);
       await expiryAPI.addExpiryItem({
         itemName: product.name,
-        category: product.category || 'General',
+        category: categoryName,
         purchasedDate: new Date().toISOString(),
         shelfLifeDays: shelfLife,
         quantity: quantity,
         unit: product.unit || 'unit',
-        location: product.category?.toLowerCase().includes('dairy') ||
-                  product.category?.toLowerCase().includes('meat') ||
-                  product.category?.toLowerCase().includes('veg')
+        location: categoryStr.includes('dairy') ||
+                  categoryStr.includes('meat') ||
+                  categoryStr.includes('veg') ||
+                  categoryStr.includes('fruit')
                     ? 'Fridge'
                     : 'Pantry',
         notes: `Catalog item: ${product.brand || ''} ${product.name}`,
@@ -125,7 +131,7 @@ const ProductDetailsScreen = ({ navigation, route }) => {
         <View style={styles.detailsCard}>
           <Text style={styles.brand}>{product.brand || 'Fresh Produce'}</Text>
           <Text style={styles.name}>{product.name}</Text>
-          <Text style={styles.unit}>{product.unit || '1 Pack'} • {product.category || 'Grocery'}</Text>
+          <Text style={styles.unit}>{product.unit || '1 Pack'} • {categoryName}</Text>
 
           <View style={styles.priceRow}>
             <Text style={styles.price}>₹{price}</Text>
@@ -169,9 +175,9 @@ const ProductDetailsScreen = ({ navigation, route }) => {
 
           <View style={styles.storageTip}>
             <Text style={styles.tipText}>
-              💡 Tip: {product.category?.toLowerCase().includes('dairy')
+              💡 Tip: {categoryStr.includes('dairy')
                 ? 'Store at 4°C in the main refrigerator compartment.'
-                : product.category?.toLowerCase().includes('fruit') || product.category?.toLowerCase().includes('veg')
+                : categoryStr.includes('fruit') || categoryStr.includes('veg')
                 ? 'Keep in crisper drawer to maintain optimal humidity and freshness.'
                 : 'Keep sealed in a cool, dry place away from direct sunlight.'}
             </Text>

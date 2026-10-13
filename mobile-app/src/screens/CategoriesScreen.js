@@ -42,6 +42,7 @@ const CategoriesScreen = ({ navigation, route }) => {
   };
 
   const productList = Array.isArray(products) ? products : [];
+  const categoryList = Array.isArray(categories) ? categories : [];
   const filteredProducts =
     selectedCategory === 'ALL'
       ? productList
@@ -70,11 +71,11 @@ const CategoriesScreen = ({ navigation, route }) => {
                 selectedCategory === 'ALL' && styles.activeChipText,
               ]}
             >
-              All Items ({products.length})
+              All Items ({productList.length})
             </Text>
           </TouchableOpacity>
 
-          {categories.map((cat, idx) => (
+          {categoryList.map((cat, idx) => (
             <TouchableOpacity
               key={cat._id || idx}
               style={[

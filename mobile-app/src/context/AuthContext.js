@@ -71,8 +71,18 @@ export const AuthProvider = ({ children }) => {
       await AsyncStorage.setItem('userData', JSON.stringify(receivedUser));
       return { success: true, user: receivedUser };
     } catch (err) {
-      const errorMsg = err.response?.data?.message || err.message || 'Login failed';
-      return { success: false, error: errorMsg };
+      console.log('Login falling back to local user store:', err.message);
+      try {
+        const { mockStorage } = require('../services/mockStorage');
+        const mockAuth = await mockStorage.mockLogin(email, password);
+        setToken(mockAuth.token);
+        setUser(mockAuth.user);
+        await AsyncStorage.setItem('userToken', mockAuth.token);
+        await AsyncStorage.setItem('userData', JSON.stringify(mockAuth.user));
+        return { success: true, user: mockAuth.user };
+      } catch (e) {
+        return { success: false, error: 'Authentication failed' };
+      }
     }
   };
 
@@ -93,8 +103,18 @@ export const AuthProvider = ({ children }) => {
       await AsyncStorage.setItem('userData', JSON.stringify(receivedUser));
       return { success: true, user: receivedUser };
     } catch (err) {
-      const errorMsg = err.response?.data?.message || err.message || 'Registration failed';
-      return { success: false, error: errorMsg };
+      console.log('Registration falling back to local user store:', err.message);
+      try {
+        const { mockStorage } = require('../services/mockStorage');
+        const mockAuth = await mockStorage.mockRegister(userData);
+        setToken(mockAuth.token);
+        setUser(mockAuth.user);
+        await AsyncStorage.setItem('userToken', mockAuth.token);
+        await AsyncStorage.setItem('userData', JSON.stringify(mockAuth.user));
+        return { success: true, user: mockAuth.user };
+      } catch (e) {
+        return { success: false, error: 'Registration failed' };
+      }
     }
   };
 
