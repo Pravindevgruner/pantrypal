@@ -14,6 +14,7 @@ import OrdersPage from './pages/OrdersPage';
 import OrderDetailsPage from './pages/OrderDetailsPage';
 import SmartExpiryDashboard from './pages/SmartExpiryDashboard';
 import HouseholdInventory from './pages/HouseholdInventory';
+import ProductDetails from './pages/ProductDetails';
 import WishlistPage from './pages/WishlistPage';
 import NotificationsPage from './pages/NotificationsPage';
 import ProfilePage from './pages/ProfilePage';
@@ -30,6 +31,8 @@ export default function App() {
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/categories" element={<CategoriesPage />} />
+                <Route path="/products/:id" element={<ProductDetails />} />
+                <Route path="/product/:id" element={<ProductDetails />} />
                 <Route path="/cart" element={<CartPage />} />
                 <Route path="/checkout" element={<CheckoutPage />} />
                 <Route path="/order-success" element={<OrderSuccess />} />

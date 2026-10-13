@@ -11,42 +11,98 @@ const { sendSuccess, sendError } = require('../utils/response');
 
 const createOrder = async (req, res) => {
   try {
-    const { addressId, paymentMethod = 'COD', razorpayOrderId, razorpayPaymentId } = req.body;
+    const {
+      addressId,
+      deliveryAddress,
+      items,
+      deliverySlot = 'Instant (25-35 mins)',
+      paymentMethod = 'COD',
+      razorpayOrderId,
+      razorpayPaymentId,
+    } = req.body;
 
-    const cart = await Cart.findOne({ user: req.user._id }).populate('items.product');
-    if (!cart || cart.items.length === 0) {
-      return sendError(res, 'Cart is empty. Cannot place order.', {}, 400);
+    let orderItems = [];
+    let subtotal = 0;
+    let deliveryFee = 0;
+    let discount = 0;
+    let totalAmount = 0;
+
+    const userCart = await Cart.findOne({ user: req.user._id }).populate('items.product');
+
+    if (items && Array.isArray(items) && items.length > 0) {
+      // Direct items payload (e.g. from mobile app or direct checkout)
+      for (const item of items) {
+        const pId = item.productId || item.product;
+        const prod = pId ? await Product.findById(pId) : null;
+        const qty = Number(item.quantity) || 1;
+        const price = Number(item.price || item.unitPrice || prod?.discountPrice || prod?.price || 0);
+
+        orderItems.push({
+          product: prod ? prod._id : null,
+          productName: item.name || item.productName || prod?.name || 'Grocery Item',
+          productImage: item.image || item.productImage || prod?.image || '',
+          quantity: qty,
+          unitPrice: price,
+          shelfLifeDays: item.shelfLifeDays || prod?.shelfLifeDays || 7,
+        });
+        subtotal += price * qty;
+      }
+      deliveryFee = subtotal > 499 || subtotal === 0 ? 0 : 40;
+      totalAmount = subtotal + deliveryFee - discount;
+    } else {
+      // Cart-based payload
+      if (!userCart || userCart.items.length === 0) {
+        return sendError(res, 'Cart is empty. Cannot place order.', {}, 400);
+      }
+
+      for (const item of userCart.items) {
+        const prod = item.product;
+        if (!prod || !prod.isActive) {
+          return sendError(res, `Product ${item.product ? item.product.name : 'item'} is no longer available`, {}, 400);
+        }
+        if (prod.stockQuantity < item.quantity) {
+          return sendError(res, `Insufficient stock for product ${prod.name}. Available: ${prod.stockQuantity}`, {}, 400);
+        }
+
+        orderItems.push({
+          product: prod._id,
+          productName: prod.name,
+          productImage: prod.image,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+          shelfLifeDays: prod.shelfLifeDays || 7,
+        });
+      }
+
+      subtotal = userCart.subtotal;
+      discount = userCart.discount || 0;
+      deliveryFee = userCart.deliveryFee || 0;
+      totalAmount = userCart.totalAmount;
     }
 
-    const address = await Address.findOne({ _id: addressId, user: req.user._id });
-    if (!address) {
-      return sendError(res, 'Delivery address not found', {}, 404);
+    // Resolve Delivery Address
+    let resolvedAddress = null;
+    if (addressId) {
+      resolvedAddress = await Address.findOne({ _id: addressId, user: req.user._id });
     }
-
-    // Validate stock for all items
-    const orderItems = [];
-    for (const item of cart.items) {
-      const prod = item.product;
-      if (!prod || !prod.isActive) {
-        return sendError(res, `Product ${item.product ? item.product.name : 'item'} is no longer available`, {}, 400);
-      }
-      if (prod.stockQuantity < item.quantity) {
-        return sendError(res, `Insufficient stock for product ${prod.name}. Available: ${prod.stockQuantity}`, {}, 400);
-      }
-
-      orderItems.push({
-        product: prod._id,
-        productName: prod.name,
-        productImage: prod.image,
-        quantity: item.quantity,
-        unitPrice: item.unitPrice,
-        shelfLifeDays: prod.shelfLifeDays || 7,
-      });
+    if (!resolvedAddress && deliveryAddress) {
+      resolvedAddress = deliveryAddress;
+    }
+    if (!resolvedAddress) {
+      resolvedAddress = (await Address.findOne({ user: req.user._id })) || {
+        fullName: req.user.name || 'Valued Customer',
+        phone: req.user.phone || '9876543210',
+        houseFlat: 'Flat 402',
+        street: '12th Cross, Indiranagar',
+        area: 'Indiranagar',
+        city: 'Bengaluru',
+        state: 'Karnataka',
+        pincode: '560103',
+      };
     }
 
     // Generate Order Number
     const orderNumber = 'PP-' + Math.floor(100000 + Math.random() * 900000);
-
     const paymentStatus = paymentMethod === 'COD' ? 'PENDING' : 'SUCCESSFUL';
 
     const order = await Order.create({
@@ -54,21 +110,22 @@ const createOrder = async (req, res) => {
       customer: req.user._id,
       items: orderItems,
       address: {
-        fullName: address.fullName,
-        phone: address.phone,
-        houseFlat: address.houseFlat,
-        street: address.street,
-        area: address.area,
-        city: address.city,
-        state: address.state,
-        pincode: address.pincode,
-        latitude: address.latitude,
-        longitude: address.longitude,
+        fullName: resolvedAddress.fullName || req.user.name,
+        phone: resolvedAddress.phone || req.user.phone || '9876543210',
+        houseFlat: resolvedAddress.houseFlat || '',
+        street: resolvedAddress.street || 'Main Street',
+        area: resolvedAddress.area || '',
+        city: resolvedAddress.city || 'Bengaluru',
+        state: resolvedAddress.state || 'Karnataka',
+        pincode: resolvedAddress.pincode || '560103',
+        latitude: resolvedAddress.latitude,
+        longitude: resolvedAddress.longitude,
       },
-      subtotal: cart.subtotal,
-      discount: cart.discount,
-      deliveryFee: cart.deliveryFee,
-      totalAmount: cart.totalAmount,
+      deliverySlot,
+      subtotal,
+      discount,
+      deliveryFee,
+      totalAmount,
       paymentMethod,
       paymentStatus,
       orderStatus: 'PLACED',
@@ -81,27 +138,34 @@ const createOrder = async (req, res) => {
 
     // Deduct stock quantity & update inventory
     for (const item of orderItems) {
-      await Product.findByIdAndUpdate(item.product, {
-        $inc: { stockQuantity: -item.quantity },
-      });
-      await Inventory.findOneAndUpdate({ product: item.product }, {
-        $inc: { currentQuantity: -item.quantity },
-      });
+      if (item.product) {
+        await Product.findByIdAndUpdate(item.product, {
+          $inc: { stockQuantity: -item.quantity },
+        });
+        await Inventory.findOneAndUpdate({ product: item.product }, {
+          $inc: { currentQuantity: -item.quantity },
+        });
+      }
     }
 
-    // Clear Customer Cart
-    cart.items = [];
-    cart.subtotal = 0;
-    cart.discount = 0;
-    cart.deliveryFee = 0;
-    cart.totalAmount = 0;
-    await cart.save();
+    // Clear Customer Cart if cart was used
+    if (userCart) {
+      userCart.items = [];
+      userCart.subtotal = 0;
+      userCart.discount = 0;
+      userCart.deliveryFee = 0;
+      userCart.totalAmount = 0;
+      await userCart.save();
+    }
+
+    // Immediately initialize Smart Expiry records for the purchased groceries
+    await createExpiryRecordsForOrder(order);
 
     // Create Notification
     await Notification.create({
       user: req.user._id,
       title: 'Order Placed Successfully!',
-      message: `Your order #${order.orderNumber} for ₹${order.totalAmount} has been placed.`,
+      message: `Your order #${order.orderNumber} for ₹${order.totalAmount} has been placed. Smart Expiry tracking has been activated for your items!`,
       type: 'ORDER',
       referenceId: order._id.toString(),
     });

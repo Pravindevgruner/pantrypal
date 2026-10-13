@@ -36,8 +36,8 @@ const orderSchema = new mongoose.Schema(
     discount: { type: Number, default: 0 },
     deliveryFee: { type: Number, default: 0 },
     totalAmount: { type: Number, required: true },
-    paymentMethod: { type: String, enum: ['UPI', 'CARD', 'NETBANKING', 'COD'], default: 'COD' },
-    paymentStatus: { type: String, enum: ['PENDING', 'SUCCESSFUL', 'FAILED', 'REFUNDED'], default: 'PENDING' },
+    paymentMethod: { type: String, enum: ['UPI', 'CARD', 'NETBANKING', 'NET_BANKING', 'COD', 'RAZORPAY', 'RAZORPAY_UPI'], default: 'COD' },
+    paymentStatus: { type: String, enum: ['PENDING', 'SUCCESSFUL', 'PAID', 'FAILED', 'REFUNDED'], default: 'PENDING' },
     orderStatus: {
       type: String,
       enum: ['PLACED', 'CONFIRMED', 'ASSIGNED', 'PICKED_UP', 'OUT_FOR_DELIVERY', 'DELIVERED', 'CANCELLED'],

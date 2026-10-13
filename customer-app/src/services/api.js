@@ -75,7 +75,10 @@ export const notificationAPI = {
 };
 
 export const expiryAPI = {
-  getExpiryItems: () => api.get('/expiry'),
+  getExpiryItems: (params) => api.get('/expiry', { params }),
+  addExpiryItem: (data) => api.post('/expiry', data),
+  updateExpiryItem: (id, data) => api.put(`/expiry/${id}`, data),
+  deleteExpiryItem: (id) => api.delete(`/expiry/${id}`),
   getFresh: () => api.get('/expiry/fresh'),
   getExpiringSoon: () => api.get('/expiry/expiring-soon'),
   getExpired: () => api.get('/expiry/expired'),

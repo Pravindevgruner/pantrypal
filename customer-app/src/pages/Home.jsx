@@ -171,7 +171,7 @@ export default function Home() {
           ) : (
             <div className="grid grid-cols-2 gap-3">
               {filteredProducts.map((product) => (
-                <ProductCard key={product._id} product={product} onSelect={(id) => navigate(`/categories`)} />
+                <ProductCard key={product._id} product={product} />
               ))}
             </div>
           )}

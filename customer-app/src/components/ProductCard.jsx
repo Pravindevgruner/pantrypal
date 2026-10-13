@@ -1,9 +1,19 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Heart, Plus, Minus, Clock, ShoppingBag } from 'lucide-react';
 import { useCart } from '../context/CartContext';
 
 export default function ProductCard({ product, onSelect }) {
+  const navigate = useNavigate();
   const { cart, addToCart, updateQuantity, wishlist, toggleWishlist } = useCart();
+
+  const handleCardClick = () => {
+    if (onSelect) {
+      onSelect(product._id);
+    } else {
+      navigate(`/products/${product._id}`);
+    }
+  };
 
   const isWishlisted = wishlist.some((p) => (p._id || p) === product._id);
   const cartItem = cart.items ? cart.items.find((item) => item.product?._id === product._id || item.product === product._id) : null;
@@ -12,7 +22,7 @@ export default function ProductCard({ product, onSelect }) {
 
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden hover:shadow-md transition group flex flex-col justify-between">
-      <div className="relative cursor-pointer" onClick={() => onSelect && onSelect(product._id)}>
+      <div className="relative cursor-pointer" onClick={handleCardClick}>
         <img
           src={product.image}
           alt={product.name}
