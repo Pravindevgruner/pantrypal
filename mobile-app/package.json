@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "android": "react-native run-android",
+    "android": "unset JAVA_TOOL_OPTIONS && export JAVA_HOME=${JAVA_HOME:-/opt/homebrew/opt/openjdk@17} && react-native run-android",
     "ios": "react-native run-ios",
     "start": "react-native start",
     "build:debug": "unset JAVA_TOOL_OPTIONS && export JAVA_HOME=${JAVA_HOME:-/opt/homebrew/opt/openjdk@17} && cd android && ./gradlew assembleDebug",
