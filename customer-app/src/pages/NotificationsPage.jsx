@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import { notificationAPI } from '../services/api';
-import { Bell, CheckCheck, ShieldAlert, Truck, Tag } from 'lucide-react';
+import { Bell, CheckCheck, ShieldAlert, Truck, Tag, ShoppingBag, CreditCard } from 'lucide-react';
 
 export default function NotificationsPage() {
   const [notifications, setNotifications] = useState([]);
@@ -36,8 +36,10 @@ export default function NotificationsPage() {
 
   const getIcon = (type) => {
     if (type === 'EXPIRY') return <ShieldAlert className="w-5 h-5 text-amber-500" />;
-    if (type === 'ORDER') return <Truck className="w-5 h-5 text-emerald-600" />;
-    return <Tag className="w-5 h-5 text-blue-500" />;
+    if (type === 'ORDER') return <ShoppingBag className="w-5 h-5 text-emerald-600" />;
+    if (type === 'DELIVERY') return <Truck className="w-5 h-5 text-purple-600" />;
+    if (type === 'PAYMENT') return <CreditCard className="w-5 h-5 text-indigo-600" />;
+    return <Tag className="w-5 h-5 text-rose-500" />;
   };
 
   return (

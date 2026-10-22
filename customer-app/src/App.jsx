@@ -17,6 +17,7 @@ import HouseholdInventory from './pages/HouseholdInventory';
 import ProductDetails from './pages/ProductDetails';
 import WishlistPage from './pages/WishlistPage';
 import NotificationsPage from './pages/NotificationsPage';
+import AddressesPage from './pages/AddressesPage';
 import ProfilePage from './pages/ProfilePage';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -42,6 +43,7 @@ export default function App() {
                 <Route path="/household-inventory" element={<HouseholdInventory />} />
                 <Route path="/wishlist" element={<WishlistPage />} />
                 <Route path="/notifications" element={<NotificationsPage />} />
+                <Route path="/addresses" element={<AddressesPage />} />
                 <Route path="/profile" element={<ProfilePage />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />

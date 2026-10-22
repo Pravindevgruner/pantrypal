@@ -7,6 +7,7 @@ const Order = require('../models/Order');
 const ExpiryItem = require('../models/ExpiryItem');
 const Cart = require('../models/Cart');
 const Wishlist = require('../models/Wishlist');
+const Notification = require('../models/Notification');
 const { calculateExpiryDate } = require('./expiryCalculator');
 
 const seedDatabase = async () => {
@@ -21,6 +22,7 @@ const seedDatabase = async () => {
     await ExpiryItem.deleteMany({});
     await Cart.deleteMany({});
     await Wishlist.deleteMany({});
+    await Notification.deleteMany({});
 
     console.log('[Seeder] Creating demo users...');
     const admin = await User.create({
@@ -325,6 +327,50 @@ const seedDatabase = async () => {
       status: 'EXPIRED',
       remindersSent: [3, 1, 0],
     });
+
+    console.log('[Seeder] Seeding initial notifications for demo customer...');
+    await Notification.create([
+      {
+        user: customer._id,
+        title: 'Order Placed! 🛍️',
+        message: `Order #${sampleOrder.orderNumber} for ₹${sampleOrder.totalAmount} has been confirmed. Fresh groceries packed with care!`,
+        type: 'ORDER',
+        referenceId: sampleOrder._id.toString(),
+        isRead: false,
+      },
+      {
+        user: customer._id,
+        title: 'Payment Successful 💳',
+        message: `Payment of ₹${sampleOrder.totalAmount} received via ${sampleOrder.paymentMethod}. Transaction recorded.`,
+        type: 'PAYMENT',
+        referenceId: sampleOrder._id.toString(),
+        isRead: false,
+      },
+      {
+        user: customer._id,
+        title: 'Delivery Partner Assigned 🛵',
+        message: `${deliveryPartner.name} has been assigned to deliver your order. Tracking is active.`,
+        type: 'DELIVERY',
+        referenceId: sampleOrder._id.toString(),
+        isRead: false,
+      },
+      {
+        user: customer._id,
+        title: 'Smart Expiry Warning ⏱️',
+        message: 'Organic Farm Fresh Milk expires in 2 days. Consume soon or freeze to prevent food waste!',
+        type: 'EXPIRY',
+        referenceId: sampleMilk._id.toString(),
+        isRead: false,
+      },
+      {
+        user: customer._id,
+        title: 'Weekend Flash Offer! 🏷️',
+        message: 'Get 25% OFF on all fresh bakery items and cold juices. Use code FRESH25 at checkout!',
+        type: 'PROMO',
+        referenceId: 'PROMO_FRESH25',
+        isRead: true,
+      },
+    ]);
 
     console.log('[Seeder] Database successfully seeded!');
     return {

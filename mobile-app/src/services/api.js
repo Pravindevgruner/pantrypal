@@ -344,6 +344,40 @@ export const orderAPI = {
       };
     }
   },
+
+  cancelOrder: async (id) => {
+    try {
+      return await api.put(`/orders/${id}/cancel`);
+    } catch (err) {
+      console.log(`[Offline Engine] Cancel order API offline. Cancelling order #${id} locally.`);
+      const res = await mockStorage.cancelOrder(id);
+      return {
+        status: 200,
+        data: {
+          success: true,
+          message: 'Order cancelled successfully',
+          order: res,
+        },
+      };
+    }
+  },
+
+  getInvoice: async (id) => {
+    try {
+      return await api.get(`/orders/${id}/invoice`);
+    } catch (err) {
+      console.log(`[Offline Engine] Invoice API offline. Generating official tax invoice for #${id} locally.`);
+      const invoice = await mockStorage.getOrderInvoice(id);
+      return {
+        status: 200,
+        data: {
+          success: true,
+          data: { invoice },
+          invoice,
+        },
+      };
+    }
+  },
 };
 
 // ==============================================================
@@ -488,6 +522,181 @@ export const expiryAPI = {
       return {
         status: 200,
         data: res,
+      };
+    }
+  },
+};
+
+// ==============================================================
+// 6. WISHLIST SERVICE WITH ZERO-API FALLBACK
+// ==============================================================
+export const wishlistAPI = {
+  getWishlist: async () => {
+    try {
+      return await api.get('/wishlist');
+    } catch (err) {
+      console.log('[Offline Engine] Wishlist API offline. Serving wishlist from local storage.');
+      const list = await mockStorage.getWishlist();
+      return {
+        status: 200,
+        data: {
+          success: true,
+          data: { wishlist: { products: list } },
+          wishlist: list,
+        },
+      };
+    }
+  },
+
+  addToWishlist: async (product) => {
+    try {
+      const pid = product._id || product.id;
+      return await api.post('/wishlist', { productId: pid });
+    } catch (err) {
+      console.log('[Offline Engine] Add to wishlist API offline. Saving locally.');
+      const list = await mockStorage.addToWishlist(product);
+      return {
+        status: 200,
+        data: {
+          success: true,
+          data: { wishlist: { products: list } },
+        },
+      };
+    }
+  },
+
+  removeFromWishlist: async (productId) => {
+    try {
+      return await api.delete(`/wishlist/${productId}`);
+    } catch (err) {
+      console.log(`[Offline Engine] Remove from wishlist API offline for #${productId}. Removing locally.`);
+      const list = await mockStorage.removeFromWishlist(productId);
+      return {
+        status: 200,
+        data: {
+          success: true,
+          data: { wishlist: { products: list } },
+        },
+      };
+    }
+  },
+
+  isInWishlist: async (productId) => {
+    return await mockStorage.isInWishlist(productId);
+  },
+};
+
+// ==============================================================
+// 7. ADDRESSES SERVICE WITH ZERO-API FALLBACK
+// ==============================================================
+export const addressAPI = {
+  getAddresses: async () => {
+    try {
+      return await api.get('/addresses');
+    } catch (err) {
+      console.log('[Offline Engine] Addresses API offline. Serving addresses from local storage.');
+      const list = await mockStorage.getAddresses();
+      return {
+        status: 200,
+        data: {
+          success: true,
+          data: { addresses: list },
+          addresses: list,
+        },
+      };
+    }
+  },
+
+  createAddress: async (data) => {
+    try {
+      return await api.post('/addresses', data);
+    } catch (err) {
+      console.log('[Offline Engine] Add address API offline. Saving address locally.');
+      const addr = await mockStorage.createAddress(data);
+      return {
+        status: 201,
+        data: {
+          success: true,
+          data: { address: addr },
+          address: addr,
+        },
+      };
+    }
+  },
+
+  updateAddress: async (id, data) => {
+    try {
+      return await api.put(`/addresses/${id}`, data);
+    } catch (err) {
+      console.log(`[Offline Engine] Update address API offline for #${id}. Updating locally.`);
+      const addr = await mockStorage.updateAddress(id, data);
+      return {
+        status: 200,
+        data: {
+          success: true,
+          data: { address: addr },
+        },
+      };
+    }
+  },
+
+  deleteAddress: async (id) => {
+    try {
+      return await api.delete(`/addresses/${id}`);
+    } catch (err) {
+      console.log(`[Offline Engine] Delete address API offline for #${id}. Deleting locally.`);
+      await mockStorage.deleteAddress(id);
+      return {
+        status: 200,
+        data: {
+          success: true,
+        },
+      };
+    }
+  },
+};
+
+// ==============================================================
+// 8. NOTIFICATION SERVICE WITH ZERO-API FALLBACK
+// ==============================================================
+export const notificationAPI = {
+  getNotifications: async () => {
+    try {
+      return await api.get('/notifications');
+    } catch (err) {
+      console.log('[Offline Engine] Notifications API offline. Serving alerts from local storage.');
+      const list = await mockStorage.getNotifications();
+      return {
+        status: 200,
+        data: {
+          success: true,
+          data: { notifications: list, unreadCount: list.filter((n) => !n.isRead).length },
+          notifications: list,
+        },
+      };
+    }
+  },
+
+  markAsRead: async (id) => {
+    try {
+      return await api.put(`/notifications/${id}/read`);
+    } catch (err) {
+      await mockStorage.markNotificationAsRead(id);
+      return {
+        status: 200,
+        data: { success: true },
+      };
+    }
+  },
+
+  markAllAsRead: async () => {
+    try {
+      return await api.put('/notifications/read-all');
+    } catch (err) {
+      await mockStorage.markAllNotificationsAsRead();
+      return {
+        status: 200,
+        data: { success: true },
       };
     }
   },

@@ -21,6 +21,9 @@ import ProfileScreen from '../screens/ProfileScreen';
 import LoginScreen from '../screens/LoginScreen';
 import RegisterScreen from '../screens/RegisterScreen';
 import SplashScreen from '../screens/SplashScreen';
+import WishlistScreen from '../screens/WishlistScreen';
+import NotificationsScreen from '../screens/NotificationsScreen';
+import AddressesScreen from '../screens/AddressesScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -142,6 +145,9 @@ const AppNavigator = () => {
       <Stack.Screen name="OrderSuccess" component={OrderSuccessScreen} />
       <Stack.Screen name="Orders" component={OrdersScreen} />
       <Stack.Screen name="OrderDetails" component={OrderDetailsScreen} />
+      <Stack.Screen name="Wishlist" component={WishlistScreen} />
+      <Stack.Screen name="Notifications" component={NotificationsScreen} />
+      <Stack.Screen name="Addresses" component={AddressesScreen} />
       <Stack.Screen name="DeliveryPartner" component={DeliveryPartnerScreen} />
       <Stack.Screen name="Login" component={LoginScreen} />
       <Stack.Screen name="Register" component={RegisterScreen} />

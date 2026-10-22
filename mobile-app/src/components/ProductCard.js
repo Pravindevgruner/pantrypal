@@ -1,18 +1,49 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { colors, spacing } from '../styles/theme';
 import { useCart } from '../context/CartContext';
+import { wishlistAPI } from '../services/api';
 
-const ProductCard = ({ product, onPress }) => {
+const ProductCard = ({ product, onPress, onWishlistChange }) => {
   const { items, addToCart, updateQuantity } = useCart();
   const productId = product._id || product.id;
-  
+  const [isWishlisted, setIsWishlisted] = useState(false);
+
   const cartItem = items.find((i) => (i.product._id || i.product.id) === productId);
   const qtyInCart = cartItem ? cartItem.quantity : 0;
 
   const price = product.discountPrice || product.price || 0;
   const originalPrice = product.price || 0;
   const hasDiscount = product.discountPrice && product.discountPrice < product.price;
+
+  useEffect(() => {
+    checkWishlist();
+  }, [productId]);
+
+  const checkWishlist = async () => {
+    try {
+      const inWishlist = await wishlistAPI.isInWishlist(productId);
+      setIsWishlisted(inWishlist);
+    } catch (e) {
+      // ignore
+    }
+  };
+
+  const handleToggleWishlist = async (e) => {
+    try {
+      if (isWishlisted) {
+        await wishlistAPI.removeFromWishlist(productId);
+        setIsWishlisted(false);
+        if (onWishlistChange) onWishlistChange(productId, false);
+      } else {
+        await wishlistAPI.addToWishlist(product);
+        setIsWishlisted(true);
+        if (onWishlistChange) onWishlistChange(productId, true);
+      }
+    } catch (err) {
+      console.warn('Wishlist toggle error:', err);
+    }
+  };
 
   return (
     <TouchableOpacity
@@ -37,6 +68,15 @@ const ProductCard = ({ product, onPress }) => {
             <Text style={styles.shelfLifeText}>⏱ {product.shelfLifeDays}d Shelf Life</Text>
           </View>
         ) : null}
+
+        {/* Wishlist Heart Button */}
+        <TouchableOpacity
+          style={styles.wishlistBtn}
+          onPress={handleToggleWishlist}
+          hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
+        >
+          <Text style={styles.wishlistIcon}>{isWishlisted ? '❤️' : '🤍'}</Text>
+        </TouchableOpacity>
       </View>
 
       <View style={styles.content}>
@@ -129,6 +169,21 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 9,
     fontWeight: '700',
+  },
+  wishlistBtn: {
+    position: 'absolute',
+    top: 6,
+    right: 6,
+    backgroundColor: 'rgba(255, 255, 255, 0.85)',
+    borderRadius: 14,
+    width: 28,
+    height: 28,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 1,
+  },
+  wishlistIcon: {
+    fontSize: 14,
   },
   content: {
     padding: spacing.sm,

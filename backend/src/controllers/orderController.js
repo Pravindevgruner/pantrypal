@@ -326,6 +326,77 @@ const updateOrderStatus = async (req, res) => {
   }
 };
 
+const getOrderInvoice = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id)
+      .populate('customer', 'name email phone')
+      .populate('deliveryPartner', 'name phone');
+
+    if (!order) return sendError(res, 'Order not found', {}, 404);
+
+    if (req.user.role === 'CUSTOMER' && order.customer._id.toString() !== req.user._id.toString()) {
+      return sendError(res, 'Access denied', {}, 403);
+    }
+
+    const subtotal = order.subtotal || order.totalAmount;
+    const taxAmount = Math.round((subtotal * 0.05) * 100) / 100; // 5% GST
+    const netAmount = subtotal - taxAmount;
+
+    const invoice = {
+      invoiceNumber: `INV-${order.orderNumber ? order.orderNumber.replace('PP-', '') : order._id.toString().slice(-6).toUpperCase()}`,
+      orderNumber: order.orderNumber,
+      orderId: order._id,
+      invoiceDate: order.createdAt,
+      placeOfSupply: `${order.address?.city || 'Bengaluru'}, ${order.address?.state || 'Karnataka'}`,
+      seller: {
+        legalName: 'PantryPal Technologies & Logistics Pvt Ltd',
+        brandName: 'PantryPal Smart Grocery',
+        gstin: '29AABCP9876F1Z5',
+        fssaiLicense: '11223344000889',
+        hubAddress: 'PantryPal Dark Store #14, 100 Feet Road, Indiranagar, Bengaluru, Karnataka - 560038',
+        supportEmail: 'care@pantrypal.store',
+        supportPhone: '+91 1800 200 4455',
+      },
+      customer: {
+        name: order.address?.fullName || order.customer?.name || 'Valued Customer',
+        phone: order.address?.phone || order.customer?.phone || '',
+        email: order.customer?.email || '',
+        shippingAddress: `${order.address?.houseFlat || ''}, ${order.address?.street || ''}, ${order.address?.area || ''}, ${order.address?.city || ''} - ${order.address?.pincode || ''}`,
+      },
+      items: order.items.map((it, idx) => ({
+        srNo: idx + 1,
+        name: it.productName,
+        hsn: '0806' + (idx + 10),
+        quantity: it.quantity,
+        unitPrice: it.unitPrice,
+        shelfLifeDays: it.shelfLifeDays,
+        itemTotal: it.quantity * it.unitPrice,
+      })),
+      pricing: {
+        subtotal: order.subtotal,
+        discount: order.discount || 0,
+        deliveryFee: order.deliveryFee || 0,
+        taxAmount,
+        netTaxableAmount: netAmount,
+        totalAmount: order.totalAmount,
+      },
+      payment: {
+        method: order.paymentMethod,
+        status: order.paymentStatus,
+        transactionId: order.razorpayPaymentId || `TXN-PP-${Math.floor(10000000 + Math.random() * 90000000)}`,
+        paidAt: order.paymentStatus === 'SUCCESSFUL' ? order.updatedAt : null,
+      },
+      smartExpiryInfo: {
+        message: 'All items in this invoice have been automatically enrolled in your Smart Expiry Tracker with dynamic freshness countdowns.',
+      },
+    };
+
+    return sendSuccess(res, 'Invoice generated successfully', { invoice });
+  } catch (error) {
+    return sendError(res, error.message, {}, 500);
+  }
+};
+
 module.exports = {
   createOrder,
   getCustomerOrders,
@@ -333,4 +404,5 @@ module.exports = {
   cancelOrder,
   getAllOrders,
   updateOrderStatus,
+  getOrderInvoice,
 };

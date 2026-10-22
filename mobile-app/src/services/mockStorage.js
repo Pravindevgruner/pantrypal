@@ -6,6 +6,9 @@ const KEYS = {
   ORDERS: '@pantrypal_mock_orders_v1',
   EXPIRY: '@pantrypal_mock_expiry_v1',
   PRODUCTS: '@pantrypal_mock_products_v1',
+  WISHLIST: '@pantrypal_mock_wishlist_v1',
+  ADDRESSES: '@pantrypal_mock_addresses_v1',
+  NOTIFICATIONS: '@pantrypal_mock_notifications_v1',
 };
 
 // 1. Initial Mock Categories
@@ -683,6 +686,262 @@ class MockStorageService {
     };
     const mockToken = `mock_jwt_token_${Date.now()}`;
     return { token: mockToken, user: mockUser };
+  }
+
+  // --- WISHLIST FALLBACK ---
+  async getWishlist() {
+    try {
+      const stored = await AsyncStorage.getItem(KEYS.WISHLIST);
+      return stored ? JSON.parse(stored) : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  async addToWishlist(product) {
+    const list = await this.getWishlist();
+    const pid = product._id || product.id;
+    if (!list.some((p) => (p._id || p.id) === pid)) {
+      list.push(product);
+      await AsyncStorage.setItem(KEYS.WISHLIST, JSON.stringify(list));
+    }
+    return list;
+  }
+
+  async removeFromWishlist(productId) {
+    let list = await this.getWishlist();
+    list = list.filter((p) => (p._id || p.id) !== productId);
+    await AsyncStorage.setItem(KEYS.WISHLIST, JSON.stringify(list));
+    return list;
+  }
+
+  async isInWishlist(productId) {
+    const list = await this.getWishlist();
+    return list.some((p) => (p._id || p.id) === productId);
+  }
+
+  // --- ADDRESSES FALLBACK ---
+  async getAddresses() {
+    try {
+      const stored = await AsyncStorage.getItem(KEYS.ADDRESSES);
+      if (stored) return JSON.parse(stored);
+      const defaults = [
+        {
+          _id: 'addr_home_1',
+          id: 'addr_home_1',
+          fullName: 'Customer User',
+          phone: '+91 9876543211',
+          houseFlat: 'Flat 402, Green Heights',
+          street: '12th Cross Road',
+          area: 'Indiranagar',
+          city: 'Bengaluru',
+          state: 'Karnataka',
+          pincode: '560103',
+          type: 'Home',
+          isDefault: true,
+        },
+        {
+          _id: 'addr_work_2',
+          id: 'addr_work_2',
+          fullName: 'Customer User',
+          phone: '+91 9876543211',
+          houseFlat: 'Unit 5B, Tech Park',
+          street: 'Outer Ring Road',
+          area: 'Bellandur',
+          city: 'Bengaluru',
+          state: 'Karnataka',
+          pincode: '560103',
+          type: 'Work',
+          isDefault: false,
+        },
+      ];
+      await AsyncStorage.setItem(KEYS.ADDRESSES, JSON.stringify(defaults));
+      return defaults;
+    } catch (e) {
+      return [];
+    }
+  }
+
+  async createAddress(addressData) {
+    const list = await this.getAddresses();
+    if (addressData.isDefault) {
+      list.forEach((a) => (a.isDefault = false));
+    }
+    const newAddress = {
+      _id: `addr_${Date.now()}`,
+      id: `addr_${Date.now()}`,
+      ...addressData,
+      isDefault: addressData.isDefault || list.length === 0,
+    };
+    list.unshift(newAddress);
+    await AsyncStorage.setItem(KEYS.ADDRESSES, JSON.stringify(list));
+    return newAddress;
+  }
+
+  async updateAddress(id, data) {
+    const list = await this.getAddresses();
+    const idx = list.findIndex((a) => a._id === id || a.id === id);
+    if (idx > -1) {
+      if (data.isDefault) {
+        list.forEach((a) => (a.isDefault = false));
+      }
+      list[idx] = { ...list[idx], ...data };
+      await AsyncStorage.setItem(KEYS.ADDRESSES, JSON.stringify(list));
+      return list[idx];
+    }
+    return null;
+  }
+
+  async deleteAddress(id) {
+    let list = await this.getAddresses();
+    list = list.filter((a) => a._id !== id && a.id !== id);
+    if (list.length > 0 && !list.some((a) => a.isDefault)) {
+      list[0].isDefault = true;
+    }
+    await AsyncStorage.setItem(KEYS.ADDRESSES, JSON.stringify(list));
+    return true;
+  }
+
+  // --- NOTIFICATIONS FALLBACK ---
+  async getNotifications() {
+    try {
+      const stored = await AsyncStorage.getItem(KEYS.NOTIFICATIONS);
+      if (stored) return JSON.parse(stored);
+      const defaults = [
+        {
+          _id: 'notif_1',
+          id: 'notif_1',
+          title: 'Order Placed! 🛍️',
+          message: 'Your order #PP-482910 has been confirmed. Fresh groceries being packed at the nearest hub.',
+          type: 'ORDER',
+          isRead: false,
+          createdAt: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
+        },
+        {
+          _id: 'notif_2',
+          id: 'notif_2',
+          title: 'Payment Confirmed 💳',
+          message: 'Payment of ₹365 received via UPI. Invoice is ready to download.',
+          type: 'PAYMENT',
+          isRead: false,
+          createdAt: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
+        },
+        {
+          _id: 'notif_3',
+          id: 'notif_3',
+          title: 'Smart Expiry Alert ⏱️',
+          message: 'Fresh Toned Milk expires in 2 days. Consume soon or freeze to prevent waste!',
+          type: 'EXPIRY',
+          isRead: false,
+          createdAt: new Date(Date.now() - 2 * 3600 * 1000).toISOString(),
+        },
+        {
+          _id: 'notif_4',
+          id: 'notif_4',
+          title: 'Delivery Partner Assigned 🛵',
+          message: 'Rajesh Kumar is on the way to Indiranagar hub to pick up your order.',
+          type: 'DELIVERY',
+          isRead: true,
+          createdAt: new Date(Date.now() - 5 * 3600 * 1000).toISOString(),
+        },
+        {
+          _id: 'notif_5',
+          id: 'notif_5',
+          title: 'Weekend Flash Offer! 🏷️',
+          message: 'Save 20% on fresh bakery & dairy items with promo code PANTRY20.',
+          type: 'PROMO',
+          isRead: true,
+          createdAt: new Date(Date.now() - 24 * 3600 * 1000).toISOString(),
+        },
+      ];
+      await AsyncStorage.setItem(KEYS.NOTIFICATIONS, JSON.stringify(defaults));
+      return defaults;
+    } catch (e) {
+      return [];
+    }
+  }
+
+  async markNotificationAsRead(id) {
+    const list = await this.getNotifications();
+    const target = list.find((n) => n._id === id || n.id === id);
+    if (target) {
+      target.isRead = true;
+      await AsyncStorage.setItem(KEYS.NOTIFICATIONS, JSON.stringify(list));
+    }
+    return target;
+  }
+
+  async markAllNotificationsAsRead() {
+    const list = await this.getNotifications();
+    list.forEach((n) => (n.isRead = true));
+    await AsyncStorage.setItem(KEYS.NOTIFICATIONS, JSON.stringify(list));
+    return list;
+  }
+
+  // --- ORDER CANCELLATION & INVOICE ---
+  async cancelOrder(orderId) {
+    const orders = await this.getOrders();
+    const target = orders.find((o) => o._id === orderId || o.id === orderId || o.orderNumber === orderId);
+    if (target) {
+      target.status = 'CANCELLED';
+      target.orderStatus = 'CANCELLED';
+      await AsyncStorage.setItem(KEYS.ORDERS, JSON.stringify(orders));
+    }
+    return target || { success: true };
+  }
+
+  async getOrderInvoice(orderId) {
+    const order = await this.getOrderById(orderId);
+    const invoiceNumber = `INV-${order.orderNumber || orderId.slice(-6).toUpperCase()}`;
+    const invoiceDate = order.createdAt || new Date().toISOString();
+
+    const items = (order.items || []).map((it, idx) => ({
+      srNo: idx + 1,
+      name: it.productName || it.name || it.product?.name || 'Fresh Grocery Item',
+      hsn: '04012000',
+      quantity: it.quantity || 1,
+      unitPrice: it.unitPrice || it.price || 50,
+      itemTotal: (it.unitPrice || it.price || 50) * (it.quantity || 1),
+    }));
+
+    const totalAmount = order.totalAmount || 100;
+    const netTaxableAmount = Math.round(totalAmount / 1.05);
+    const taxAmount = totalAmount - netTaxableAmount;
+
+    return {
+      invoiceNumber,
+      invoiceDate,
+      orderNumber: order.orderNumber || order._id,
+      seller: {
+        legalName: 'PantryPal Retail Logistics Private Limited',
+        brandName: 'PantryPal Supermarket',
+        gstin: '29AABCP1345L1Z8',
+        fssaiLicense: '11223334000192',
+        hubAddress: 'Hub 12, Indiranagar Logistics Cluster, Bengaluru - 560038',
+      },
+      customer: {
+        name: order.address?.fullName || 'Customer User',
+        phone: order.address?.phone || '+91 9876543211',
+        shippingAddress: `${order.address?.houseFlat || ''} ${order.address?.street || ''}, ${order.address?.city || 'Bengaluru'} - ${order.address?.pincode || '560038'}`,
+      },
+      payment: {
+        method: order.paymentMethod || 'Razorpay / UPI',
+        status: order.paymentStatus || 'PAID',
+      },
+      items,
+      pricing: {
+        subtotal: order.subtotal || totalAmount,
+        discount: order.discount || 0,
+        deliveryFee: order.deliveryFee || 0,
+        taxAmount,
+        netTaxableAmount,
+        totalAmount,
+      },
+      smartExpiryInfo: {
+        guarantee: true,
+        message: 'All items are backed by PantryPal Freshness & Automated Expiry Tracking System.',
+      },
+    };
   }
 }
 

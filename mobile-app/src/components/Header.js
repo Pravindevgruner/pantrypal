@@ -14,7 +14,7 @@ const Header = ({ title, subtitle, showBack, onBack, rightAction, navigation }) 
             <Text style={styles.backText}>←</Text>
           </TouchableOpacity>
         )}
-        <View>
+        <View style={{ flex: 1 }}>
           <Text style={styles.title} numberOfLines={1}>{title}</Text>
           {subtitle && <Text style={styles.subtitle} numberOfLines={1}>{subtitle}</Text>}
         </View>
@@ -24,17 +24,40 @@ const Header = ({ title, subtitle, showBack, onBack, rightAction, navigation }) 
         {rightAction ? (
           rightAction
         ) : navigation ? (
-          <TouchableOpacity
-            style={styles.cartBtn}
-            onPress={() => navigation.navigate('Cart')}
-          >
-            <Text style={styles.cartIcon}>🛒</Text>
-            {itemCount > 0 && (
-              <View style={styles.badge}>
-                <Text style={styles.badgeText}>{itemCount}</Text>
-              </View>
+          <View style={styles.iconGroup}>
+            {!showBack && (
+              <>
+                <TouchableOpacity
+                  style={styles.iconBtn}
+                  onPress={() => navigation.navigate('Wishlist')}
+                  hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+                >
+                  <Text style={styles.actionIcon}>❤️</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity
+                  style={styles.iconBtn}
+                  onPress={() => navigation.navigate('Notifications')}
+                  hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+                >
+                  <Text style={styles.actionIcon}>🔔</Text>
+                </TouchableOpacity>
+              </>
             )}
-          </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.cartBtn}
+              onPress={() => navigation.navigate('Cart')}
+              hitSlop={{ top: 6, bottom: 6, left: 6, right: 6 }}
+            >
+              <Text style={styles.cartIcon}>🛒</Text>
+              {itemCount > 0 && (
+                <View style={styles.badge}>
+                  <Text style={styles.badgeText}>{itemCount}</Text>
+                </View>
+              )}
+            </TouchableOpacity>
+          </View>
         ) : null}
       </View>
     </View>
@@ -48,7 +71,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: spacing.lg,
+    paddingHorizontal: spacing.md,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
     elevation: 2,
@@ -57,29 +80,41 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1,
+    marginRight: 8,
   },
   backButton: {
-    marginRight: spacing.md,
+    marginRight: spacing.sm,
     padding: spacing.xs,
   },
   backText: {
-    fontSize: 24,
+    fontSize: 22,
     color: colors.primaryDark,
     fontWeight: 'bold',
   },
   title: {
-    fontSize: 18,
+    fontSize: 17,
     fontWeight: '700',
     color: colors.text,
   },
   subtitle: {
-    fontSize: 12,
+    fontSize: 11,
     color: colors.textMuted,
     marginTop: 1,
   },
   right: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  iconGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  iconBtn: {
+    padding: spacing.xs,
+    marginRight: 6,
+  },
+  actionIcon: {
+    fontSize: 20,
   },
   cartBtn: {
     position: 'relative',

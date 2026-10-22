@@ -2,6 +2,7 @@ const crypto = require('crypto');
 const Razorpay = require('razorpay');
 const Payment = require('../models/Payment');
 const Order = require('../models/Order');
+const Notification = require('../models/Notification');
 const { sendSuccess, sendError } = require('../utils/response');
 
 const key_id = process.env.RAZORPAY_KEY_ID || 'rzp_test_pantrypal123';
@@ -103,6 +104,14 @@ const verifyPayment = async (req, res) => {
       razorpayPaymentId: razorpay_payment_id || '',
       razorpaySignature: razorpay_signature || '',
       rawResponse: req.body,
+    });
+
+    await Notification.create({
+      user: req.user._id,
+      title: 'Payment Confirmed! 💳',
+      message: `Payment of ₹${order.totalAmount} for Order #${order.orderNumber} confirmed successfully.`,
+      type: 'PAYMENT',
+      referenceId: order._id.toString(),
     });
 
     return sendSuccess(res, 'Payment verified successfully', {

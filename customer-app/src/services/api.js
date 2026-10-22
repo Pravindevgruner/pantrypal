@@ -56,11 +56,19 @@ export const addressAPI = {
   deleteAddress: (id) => api.delete(`/addresses/${id}`),
 };
 
+export const authAPI = {
+  login: (data) => api.post('/auth/login', data),
+  register: (data) => api.post('/auth/register', data),
+  getProfile: () => api.get('/auth/profile'),
+  updateProfile: (data) => api.put('/auth/profile', data),
+};
+
 export const orderAPI = {
   createOrder: (data) => api.post('/orders', data),
   getOrders: () => api.get('/orders'),
   getOrderById: (id) => api.get(`/orders/${id}`),
   cancelOrder: (id) => api.put(`/orders/${id}/cancel`),
+  getInvoice: (id) => api.get(`/orders/${id}/invoice`),
 };
 
 export const paymentAPI = {

@@ -96,17 +96,17 @@ const updateDeliveryStatus = async (req, res) => {
 
         await Notification.create({
           user: order.customer,
-          title: 'Order Delivered!',
+          title: 'Order Delivered! 🎉',
           message: `Your grocery order #${order.orderNumber} has been delivered. Your Smart Expiry tracker is active!`,
-          type: 'ORDER',
+          type: 'DELIVERY',
           referenceId: order._id.toString(),
         });
       } else {
         await Notification.create({
           user: order.customer,
-          title: `Order Status: ${status.replace(/_/g, ' ')}`,
-          message: `Your order #${order.orderNumber} status is now ${status.replace(/_/g, ' ')}.`,
-          type: 'ORDER',
+          title: `Delivery Update: ${status.replace(/_/g, ' ')}`,
+          message: `Your order #${order.orderNumber} is now ${status.replace(/_/g, ' ')}.`,
+          type: 'DELIVERY',
           referenceId: order._id.toString(),
         });
       }

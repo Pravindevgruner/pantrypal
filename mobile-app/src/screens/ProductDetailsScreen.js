@@ -13,16 +13,38 @@ import { colors, spacing } from '../styles/theme';
 import Header from '../components/Header';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
-import { expiryAPI } from '../services/api';
+import { expiryAPI, wishlistAPI } from '../services/api';
 
 const ProductDetailsScreen = ({ navigation, route }) => {
   const { product } = route.params || {};
+  const productId = product?._id || product?.id;
   const { addToCart } = useCart();
   const { isAuthenticated, quickDemoLogin } = useAuth();
 
   const [quantity, setQuantity] = useState(1);
   const [addingToPantry, setAddingToPantry] = useState(false);
   const [pantryAdded, setPantryAdded] = useState(false);
+  const [isWishlisted, setIsWishlisted] = useState(false);
+
+  React.useEffect(() => {
+    if (productId) {
+      wishlistAPI.isInWishlist(productId).then(setIsWishlisted).catch(() => {});
+    }
+  }, [productId]);
+
+  const handleToggleWishlist = async () => {
+    try {
+      if (isWishlisted) {
+        await wishlistAPI.removeFromWishlist(productId);
+        setIsWishlisted(false);
+      } else {
+        await wishlistAPI.addToWishlist(product);
+        setIsWishlisted(true);
+      }
+    } catch (e) {
+      console.warn(e);
+    }
+  };
 
   if (!product) {
     return (
@@ -125,6 +147,14 @@ const ProductDetailsScreen = ({ navigation, route }) => {
               <Text style={styles.discountText}>{discountPercent}% OFF</Text>
             </View>
           )}
+
+          <TouchableOpacity
+            style={styles.wishlistBtn}
+            onPress={handleToggleWishlist}
+            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+          >
+            <Text style={styles.wishlistIcon}>{isWishlisted ? '❤️' : '🤍'}</Text>
+          </TouchableOpacity>
         </View>
 
         {/* Product Info */}
@@ -276,6 +306,25 @@ const styles = StyleSheet.create({
     color: '#ffffff',
     fontSize: 11,
     fontWeight: '800',
+  },
+  wishlistBtn: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: 20,
+    width: 40,
+    height: 40,
+    justifyContent: 'center',
+    alignItems: 'center',
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+  },
+  wishlistIcon: {
+    fontSize: 20,
   },
   detailsCard: {
     backgroundColor: colors.surface,
