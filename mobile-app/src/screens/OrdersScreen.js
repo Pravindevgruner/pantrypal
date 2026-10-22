@@ -104,7 +104,7 @@ const OrdersScreen = ({ navigation }) => {
               </Text>
               <TouchableOpacity
                 style={styles.shopBtn}
-                onPress={() => navigation.navigate('Home')}
+                onPress={() => navigation.navigate('Main')}
               >
                 <Text style={styles.shopBtnText}>Shop Groceries Now</Text>
               </TouchableOpacity>
@@ -136,7 +136,7 @@ const OrdersScreen = ({ navigation }) => {
 
                   <View style={styles.itemsRow}>
                     <Text style={styles.itemsSummary} numberOfLines={2}>
-                      {ord.items?.map((i) => `${i.quantity}x ${i.name || i.product?.name}`).join(', ')}
+                      {ord.items?.map((i) => `${i.quantity}x ${i.name || i.productName || i.product?.name || 'Grocery Item'}`).join(', ')}
                     </Text>
                   </View>
 

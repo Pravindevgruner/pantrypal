@@ -57,7 +57,7 @@ const CartScreen = ({ navigation }) => {
           </Text>
           <TouchableOpacity
             style={styles.shopBtn}
-            onPress={() => navigation.navigate('Home')}
+            onPress={() => navigation.navigate('Main')}
           >
             <Text style={styles.shopBtnText}>Start Shopping</Text>
           </TouchableOpacity>

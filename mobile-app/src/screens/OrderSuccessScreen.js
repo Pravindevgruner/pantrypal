@@ -68,7 +68,7 @@ const OrderSuccessScreen = ({ navigation, route }) => {
 
         <TouchableOpacity
           style={styles.tertiaryBtn}
-          onPress={() => navigation.navigate('Home')}
+          onPress={() => navigation.navigate('Main')}
         >
           <Text style={styles.tertiaryBtnText}>Continue Shopping</Text>
         </TouchableOpacity>

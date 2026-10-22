@@ -6,12 +6,81 @@ const { sendSuccess, sendError } = require('../utils/response');
 
 const getAssignedOrders = async (req, res) => {
   try {
-    const deliveries = await Delivery.find({ deliveryPartner: req.user._id })
+    let deliveries = await Delivery.find({ deliveryPartner: req.user._id })
       .populate({
         path: 'order',
         populate: { path: 'customer', select: 'name phone email' },
       })
       .sort({ createdAt: -1 });
+
+    if (deliveries.length === 0) {
+      let activeOrders = await Order.find({
+        orderStatus: { $in: ['PLACED', 'CONFIRMED', 'ASSIGNED', 'PICKED_UP', 'OUT_FOR_DELIVERY'] },
+      }).populate('customer', 'name phone email');
+
+      if (activeOrders.length === 0) {
+        const User = require('../models/User');
+        const customer = await User.findOne({ role: 'CUSTOMER' });
+        if (customer) {
+          const sampleOrd = await Order.create({
+            orderNumber: `PP-${Math.floor(100000 + Math.random() * 900000)}`,
+            customer: customer._id,
+            items: [
+              {
+                productName: 'Fresh Toned Milk 1L',
+                quantity: 2,
+                unitPrice: 60,
+                totalPrice: 120,
+                shelfLifeDays: 5,
+              },
+              {
+                productName: 'Farm Fresh Brown Eggs (Pack of 6)',
+                quantity: 1,
+                unitPrice: 82,
+                totalPrice: 82,
+                shelfLifeDays: 21,
+              },
+            ],
+            shippingAddress: {
+              fullName: customer.name || 'Priya Sharma',
+              phone: customer.phone || '+91 9876543210',
+              houseFlat: 'Flat 402, Sunshine Apartments',
+              street: '12th Cross, Indiranagar',
+              city: 'Bengaluru',
+              pincode: '560038',
+              type: 'Home',
+            },
+            paymentMethod: 'ONLINE',
+            paymentStatus: 'PAID',
+            subtotal: 202,
+            deliveryFee: 20,
+            tax: 10,
+            totalAmount: 232,
+            orderStatus: 'CONFIRMED',
+            deliveryPartner: req.user._id,
+            timeline: [
+              { status: 'PLACED', note: 'Order placed' },
+              { status: 'CONFIRMED', note: 'Ready for delivery partner pickup' },
+            ],
+          });
+          const populatedSample = await Order.findById(sampleOrd._id).populate('customer', 'name phone email');
+          activeOrders = [populatedSample];
+        }
+      }
+
+      for (const ord of activeOrders) {
+        const d = await Delivery.create({
+          order: ord._id,
+          deliveryPartner: req.user._id,
+          status: ord.orderStatus === 'PLACED' ? 'PENDING' : 'ACCEPTED',
+        });
+        const populated = await Delivery.findById(d._id).populate({
+          path: 'order',
+          populate: { path: 'customer', select: 'name phone email' },
+        });
+        deliveries.push(populated);
+      }
+    }
 
     return sendSuccess(res, 'Assigned delivery orders fetched', { deliveries });
   } catch (error) {
@@ -142,10 +211,42 @@ const getEarningsSummary = async (req, res) => {
   }
 };
 
+const getDeliveryHistory = async (req, res) => {
+  try {
+    let deliveries = await Delivery.find({
+      deliveryPartner: req.user._id,
+      status: 'DELIVERED',
+    })
+      .populate({
+        path: 'order',
+        populate: { path: 'customer', select: 'name phone email' },
+      })
+      .sort({ deliveredAt: -1, updatedAt: -1 });
+
+    if (deliveries.length === 0) {
+      const deliveredOrders = await Order.find({ orderStatus: 'DELIVERED' })
+        .populate('customer', 'name phone email')
+        .sort({ updatedAt: -1 });
+
+      deliveries = deliveredOrders.map((ord) => ({
+        _id: ord._id,
+        order: ord,
+        status: 'DELIVERED',
+        deliveredAt: ord.updatedAt,
+      }));
+    }
+
+    return sendSuccess(res, 'Delivery history fetched', { deliveries });
+  } catch (error) {
+    return sendError(res, error.message, {}, 500);
+  }
+};
+
 module.exports = {
   getAssignedOrders,
   acceptOrder,
   rejectOrder,
   updateDeliveryStatus,
   getEarningsSummary,
+  getDeliveryHistory,
 };

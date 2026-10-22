@@ -39,7 +39,7 @@ const RegisterScreen = ({ navigation }) => {
 
       if (res.success) {
         Alert.alert('Welcome to PantryPal! 🎉', 'Account created successfully.');
-        navigation.navigate('Home');
+        navigation.navigate('Main');
       } else {
         Alert.alert('Registration Failed', res.error);
       }

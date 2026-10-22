@@ -79,7 +79,7 @@ const CheckoutScreen = ({ navigation }) => {
         navigation.replace('OrderSuccess', { order: localOrder });
       } catch (e) {
         clearCart();
-        navigation.navigate('Shop');
+        navigation.navigate('Main');
       }
     } finally {
       setLoading(false);

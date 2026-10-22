@@ -132,7 +132,7 @@ const WishlistScreen = ({ navigation }) => {
           </Text>
           <TouchableOpacity
             style={styles.exploreBtn}
-            onPress={() => navigation.navigate('HomeTab')}
+            onPress={() => navigation.navigate('Main')}
           >
             <Text style={styles.exploreBtnText}>Browse Groceries</Text>
           </TouchableOpacity>

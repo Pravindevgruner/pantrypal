@@ -702,4 +702,121 @@ export const notificationAPI = {
   },
 };
 
+// ==============================================================
+// 9. DELIVERY PARTNER SERVICE WITH ZERO-API FALLBACK
+// ==============================================================
+export const deliveryAPI = {
+  getAssignedOrders: async () => {
+    try {
+      return await api.get('/delivery/orders');
+    } catch (err) {
+      console.log('[Offline Engine] Delivery orders API offline. Loading local deliveries.');
+      const list = await mockStorage.getDeliveryOrders();
+      return {
+        status: 200,
+        data: {
+          success: true,
+          data: {
+            deliveries: list.map((o) => ({
+              _id: o._id || o.id,
+              order: o,
+              status: o.orderStatus || o.status || 'CONFIRMED',
+            })),
+          },
+          deliveries: list.map((o) => ({
+            _id: o._id || o.id,
+            order: o,
+            status: o.orderStatus || o.status || 'CONFIRMED',
+          })),
+        },
+      };
+    }
+  },
+
+  acceptOrder: async (id) => {
+    try {
+      return await api.post(`/delivery/orders/${id}/accept`);
+    } catch (err) {
+      const updated = await mockStorage.acceptDeliveryOrder(id);
+      return {
+        status: 200,
+        data: { success: true, delivery: { _id: id, status: 'ACCEPTED', order: updated } },
+      };
+    }
+  },
+
+  rejectOrder: async (id) => {
+    try {
+      return await api.post(`/delivery/orders/${id}/reject`);
+    } catch (err) {
+      const updated = await mockStorage.rejectDeliveryOrder(id);
+      return {
+        status: 200,
+        data: { success: true, delivery: { _id: id, status: 'REJECTED', order: updated } },
+      };
+    }
+  },
+
+  updateStatus: async (id, status) => {
+    try {
+      return await api.put(`/delivery/orders/${id}/status`, { status });
+    } catch (err) {
+      const updated = await mockStorage.updateOrderStatus(id, status);
+      return {
+        status: 200,
+        data: { success: true, delivery: { _id: id, status, order: updated } },
+      };
+    }
+  },
+
+  getHistory: async () => {
+    try {
+      return await api.get('/delivery/history');
+    } catch (err) {
+      const list = await mockStorage.getDeliveryHistory();
+      return {
+        status: 200,
+        data: {
+          success: true,
+          data: {
+            deliveries: list.map((o) => ({
+              _id: o._id || o.id,
+              order: o,
+              status: 'DELIVERED',
+            })),
+          },
+          deliveries: list.map((o) => ({
+            _id: o._id || o.id,
+            order: o,
+            status: 'DELIVERED',
+          })),
+        },
+      };
+    }
+  },
+
+  getDeliveryHistory: async () => {
+    return deliveryAPI.getHistory();
+  },
+
+  getEarnings: async () => {
+    try {
+      return await api.get('/delivery/earnings');
+    } catch (err) {
+      const history = await mockStorage.getDeliveryHistory();
+      return {
+        status: 200,
+        data: {
+          success: true,
+          data: {
+            totalDeliveries: history.length,
+            totalEarnings: history.length * 45,
+            deliveries: history,
+          },
+        },
+      };
+    }
+  },
+};
+
 export default api;

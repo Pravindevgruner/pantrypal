@@ -178,8 +178,21 @@ const createOrder = async (req, res) => {
 
 const getCustomerOrders = async (req, res) => {
   try {
-    const orders = await Order.find({ customer: req.user._id }).sort({ createdAt: -1 });
-    return sendSuccess(res, 'Customer orders fetched', { orders });
+    let query = { customer: req.user._id };
+    if (req.user.role === 'DELIVERY_PARTNER') {
+      query = {
+        $or: [
+          { deliveryPartner: req.user._id },
+          { orderStatus: { $in: ['PLACED', 'CONFIRMED', 'ASSIGNED', 'PICKED_UP', 'OUT_FOR_DELIVERY', 'DELIVERED'] } },
+        ],
+      };
+    } else if (req.user.role === 'ADMIN') {
+      query = {};
+    }
+    const orders = await Order.find(query)
+      .populate('customer', 'name phone email')
+      .sort({ createdAt: -1 });
+    return sendSuccess(res, 'Orders fetched', { orders });
   } catch (error) {
     return sendError(res, error.message, {}, 500);
   }

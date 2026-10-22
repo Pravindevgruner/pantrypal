@@ -641,7 +641,66 @@ class MockStorageService {
   }
 
   async getDeliveryOrders() {
-    return this.getOrders();
+    let orders = await this.getOrders();
+    const hasActive = orders.some((o) => {
+      const st = (o.orderStatus || o.status || '').toUpperCase();
+      return ['PLACED', 'CONFIRMED', 'ASSIGNED', 'PICKED_UP', 'OUT_FOR_DELIVERY'].includes(st);
+    });
+
+    if (!hasActive) {
+      const sampleActiveOrder = {
+        _id: 'ord_active_partner_1',
+        id: 'ord_active_partner_1',
+        orderNumber: 'PP-294810',
+        status: 'CONFIRMED',
+        orderStatus: 'CONFIRMED',
+        paymentMethod: 'ONLINE',
+        paymentStatus: 'PAID',
+        subtotal: 187,
+        deliveryFee: 20,
+        totalAmount: 207,
+        createdAt: new Date().toISOString(),
+        items: [
+          {
+            productName: 'Fresh Toned Milk 1L',
+            quantity: 2,
+            unitPrice: 60,
+            shelfLifeDays: 5,
+          },
+          {
+            productName: 'Whole Wheat Brown Bread 400g',
+            quantity: 1,
+            unitPrice: 45,
+            shelfLifeDays: 7,
+          },
+        ],
+        address: {
+          fullName: 'Priya Sharma',
+          phone: '+91 9876543210',
+          houseFlat: 'Flat 402, Sunshine Apartments',
+          street: '12th Cross, Indiranagar',
+          city: 'Bengaluru',
+          pincode: '560038',
+          type: 'Home',
+        },
+      };
+      orders.unshift(sampleActiveOrder);
+      await AsyncStorage.setItem(KEYS.ORDERS, JSON.stringify(orders));
+    }
+    return orders;
+  }
+
+  async acceptDeliveryOrder(orderId) {
+    return this.updateOrderStatus(orderId, 'CONFIRMED');
+  }
+
+  async rejectDeliveryOrder(orderId) {
+    return this.updateOrderStatus(orderId, 'PLACED');
+  }
+
+  async getDeliveryHistory() {
+    const orders = await this.getOrders();
+    return orders.filter((o) => (o.orderStatus || o.status) === 'DELIVERED');
   }
 
   // --- AUTHENTICATION FALLBACK ---
