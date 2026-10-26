@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>PantryPal - Complete Module Fulfillment & Step-by-Step Test Guide</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+    :root {
+      --primary: #059669;
+      --primary-dark: #047857;
+      --primary-light: #ecfdf5;
+      --slate-900: #0f172a;
+      --slate-800: #1e293b;
+      --slate-700: #334155;
+      --slate-600: #475569;
+      --slate-500: #64748b;
+      --slate-200: #e2e8f0;
+      --slate-100: #f1f5f9;
+      --slate-50: #f8fafc;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      color: var(--slate-800);
+      background: #ffffff;
+      line-height: 1.45;
+      font-size: 11.5px;
+      -webkit-font-smoothing: antialiased;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    @page {
+      size: A4 portrait;
+      margin: 12mm 14mm 14mm 14mm;
+    }
+
+    .container {
+      max-width: 100%;
+    }
+
+    /* Header Banner */
+    .header-banner {
+      background: linear-gradient(135deg, #064e3b 0%, #065f46 50%, #047857 100%);
+      color: white;
+      padding: 20px 24px;
+      border-radius: 12px;
+      margin-bottom: 16px;
+      box-shadow: 0 4px 12px rgba(6, 78, 59, 0.15);
+    }
+
+    .brand-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 10px;
+    }
+
+    .brand-title {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .badge-doc {
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      color: #ffffff;
+      font-size: 10px;
+      font-weight: 700;
+      padding: 4px 10px;
+      border-radius: 20px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .header-sub {
+      font-size: 12.5px;
+      color: #a7f3d0;
+      max-width: 95%;
+      font-weight: 500;
+      line-height: 1.45;
+    }
+
+    .meta-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 12px;
+      padding-top: 10px;
+      border-top: 1px solid rgba(255, 255, 255, 0.18);
+      font-size: 10.5px;
+    }
+
+    .meta-pill {
+      background: rgba(0, 0, 0, 0.22);
+      padding: 3px 9px;
+      border-radius: 6px;
+      color: #e6fffa;
+    }
+
+    /* Section Headings */
+    h2.section-header {
+      font-size: 14.5px;
+      font-weight: 800;
+      color: var(--slate-900);
+      margin: 16px 0 10px 0;
+      padding-bottom: 5px;
+      border-bottom: 2px solid var(--slate-200);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      margin: 8px 0 14px 0;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--slate-200);
+      font-size: 11px;
+    }
+
+    th {
+      background: var(--slate-100);
+      color: var(--slate-700);
+      font-weight: 700;
+      padding: 7px 10px;
+      text-align: left;
+      border-bottom: 1px solid var(--slate-200);
+    }
+
+    td {
+      padding: 6.5px 10px;
+      border-bottom: 1px solid var(--slate-200);
+      color: var(--slate-800);
+      vertical-align: middle;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:nth-child(even) td {
+      background: var(--slate-50);
+    }
+
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      background: var(--slate-100);
+      color: #0f766e;
+      padding: 1px 5px;
+      border-radius: 4px;
+      border: 1px solid #cbd5e1;
+    }
+
+    /* Module Card */
+    .module-card {
+      background: #ffffff;
+      border: 1px solid var(--slate-200);
+      border-radius: 10px;
+      padding: 13px 15px;
+      margin-bottom: 14px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    }
+
+    .module-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      padding-bottom: 6px;
+      border-bottom: 1.5px solid var(--slate-200);
+    }
+
+    .module-title {
+      font-size: 14px;
+      font-weight: 800;
+      color: var(--slate-900);
+    }
+
+    .module-badge {
+      font-size: 9.5px;
+      font-weight: 700;
+      padding: 2.5px 8px;
+      border-radius: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .badge-primary { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+    .badge-blue { background: #dbeafe; color: #1e40af; border: 1px solid #bfdbfe; }
+    .badge-purple { background: #f3e8ff; color: #6b21a8; border: 1px solid #e9d5ff; }
+    .badge-amber { background: #fef3c7; color: #92400e; border: 1px solid #fde68a; }
+
+    .block-subtitle {
+      font-size: 11.5px;
+      font-weight: 700;
+      color: var(--primary-dark);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin: 8px 0 5px 0;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .fulfillment-list {
+      list-style-type: none;
+      margin-bottom: 8px;
+    }
+
+    .fulfillment-list li {
+      position: relative;
+      padding-left: 16px;
+      margin-bottom: 3.5px;
+      font-size: 11px;
+      color: var(--slate-700);
+      line-height: 1.45;
+    }
+
+    .fulfillment-list li::before {
+      content: "✔";
+      position: absolute;
+      left: 0;
+      color: var(--primary);
+      font-weight: bold;
+      font-size: 10px;
+    }
+
+    .test-steps-box {
+      background: var(--slate-50);
+      border: 1px solid var(--slate-200);
+      border-radius: 8px;
+      padding: 10px 12px;
+      margin-top: 6px;
+    }
+
+    .step-item {
+      margin-bottom: 6px;
+      padding-bottom: 6px;
+      border-bottom: 1px dashed var(--slate-200);
+    }
+
+    .step-item:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border-bottom: none;
+    }
+
+    .step-title {
+      font-weight: 700;
+      color: var(--slate-900);
+      font-size: 11px;
+      margin-bottom: 2px;
+    }
+
+    .step-instruction {
+      color: var(--slate-600);
+      font-size: 10.5px;
+      margin-left: 12px;
+      margin-bottom: 2px;
+    }
+
+    .expected-result {
+      margin-left: 12px;
+      background: #ecfdf5;
+      border-left: 3px solid var(--primary);
+      padding: 2.5px 7px;
+      font-size: 10.5px;
+      color: #065f46;
+      font-weight: 600;
+      border-radius: 0 4px 4px 0;
+    }
+
+    .page-break {
+      page-break-before: always;
+      break-before: page;
+    }
+
+    .pill-green {
+      background: #dcfce7;
+      color: #15803d;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 10.5px;
+    }
+
+    .footer {
+      text-align: center;
+      font-size: 10px;
+      color: var(--slate-500);
+      margin-top: 18px;
+      padding-top: 8px;
+      border-top: 1px solid var(--slate-200);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- Header Banner -->
+    <div class="header-banner">
+      <div class="brand-row">
+        <div class="brand-title">
+          <span>🌿 PantryPal</span>
+        </div>
+        <div class="badge-doc">Official Technical Specification & Test Guide</div>
+      </div>
+      <div class="header-sub">
+        Comprehensive verification report and step-by-step test manual covering all 7 core modules across Backend REST API, Customer Web Portal, Delivery Partner Portal, Admin Dashboard, and React Native Mobile Application.
+      </div>
+      <div class="meta-pills">
+        <span class="meta-pill"><strong>Engine:</strong> Node.js & React Native</span>
+        <span class="meta-pill"><strong>Date:</strong> October 2026</span>
+        <span class="meta-pill"><strong>Status:</strong> 100% Fulfilled & Verified Live</span>
+        <span class="meta-pill"><strong>Offline Support:</strong> Zero-API Fallback Active</span>
+      </div>
+    </div>
+
+    <!-- System URLs & Access Table -->
+    <h2 class="section-header">🌐 System Architecture & Access URLs</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Application / Service</th>
+          <th>Platform / Stack</th>
+          <th>Port / Access URL</th>
+          <th>Core Purpose</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Backend REST API</strong></td>
+          <td>Node.js / Express / In-Memory DB</td>
+          <td><code>http://localhost:5000</code></td>
+          <td>Core REST endpoints, auth, cron jobs, Smart Expiry engine</td>
+        </tr>
+        <tr>
+          <td><strong>Customer Web App</strong></td>
+          <td>React / Vite / Tailwind</td>
+          <td><code>http://localhost:3000</code></td>
+          <td>Desktop shopping, cart, checkout, household pantry management</td>
+        </tr>
+        <tr>
+          <td><strong>Delivery Partner App</strong></td>
+          <td>React / Vite / Tailwind</td>
+          <td><code>http://localhost:3001</code></td>
+          <td>Logistics console, order dispatch, status workflow, route review</td>
+        </tr>
+        <tr>
+          <td><strong>Admin Web Panel</strong></td>
+          <td>React / Vite / Tailwind</td>
+          <td><code>http://localhost:3002</code></td>
+          <td>Inventory management, category/product CRUD, sales reports</td>
+        </tr>
+        <tr>
+          <td><strong>Mobile App</strong></td>
+          <td>React Native (Android & iOS)</td>
+          <td>Android Emulator / Phone</td>
+          <td>Native customer & delivery agent app with zero-API offline fallback</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Default Demo Credentials -->
+    <h2 class="section-header">🔑 Default Demo Credentials & Quick Switchers</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>User Role</th>
+          <th>Email Address</th>
+          <th>Password</th>
+          <th>Mobile 1-Tap Switcher</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Customer User</strong></td>
+          <td><code>customer@example.com</code></td>
+          <td><code>password123</code></td>
+          <td>Tap <strong>Customer</strong> button on Account tab</td>
+        </tr>
+        <tr>
+          <td><strong>Delivery Partner</strong></td>
+          <td><code>delivery@example.com</code></td>
+          <td><code>password123</code></td>
+          <td>Tap <strong>Delivery</strong> button on Account tab</td>
+        </tr>
+        <tr>
+          <td><strong>System Administrator</strong></td>
+          <td><code>admin@example.com</code></td>
+          <td><code>password123</code></td>
+          <td>Tap <strong>Admin</strong> button on Account tab</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="page-break"></div>
+
+    <!-- MODULE 1 -->
+    <div class="module-card">
+      <div class="module-card-header">
+        <div class="module-title">Module 1: Customer Module</div>
+        <span class="module-badge badge-primary">Fulfilled & Verified</span>
+      </div>
+
+      <div class="block-subtitle">Architecture & Implementation:</div>
+      <ul class="fulfillment-list">
+        <li><strong>User registration and login:</strong> Implemented via <code>/api/auth/register</code> and <code>/api/auth/login</code> with JWT token generation and BCrypt encryption. Mobile app features native registration and local AsyncStorage credential caching.</li>
+        <li><strong>Browse categories and products:</strong> Dynamic category carousels and product catalogs. Products feature pricing, discounts, weights, and high-visibility <strong>shelf-life tags</strong> (e.g., <code>5d Shelf Life</code>).</li>
+        <li><strong>Search and filter:</strong> Real-time search query matching product names/descriptions, category filter chips, and sorting.</li>
+        <li><strong>Add items to cart and wishlist:</strong> State-managed Cart and persistent Wishlist with subtotal, taxes, and delivery fee calculation.</li>
+        <li><strong>Place orders and make online payments:</strong> Checkout workflow supporting multiple payment options, automatic order numbering (<code>PP-XXXXXX</code>), and simulated gateway callbacks.</li>
+        <li><strong>Track order status:</strong> Multi-stage progress tracking (<code>PLACED</code> &rarr; <code>CONFIRMED</code> &rarr; <code>PICKED_UP</code> &rarr; <code>OUT_FOR_DELIVERY</code> &rarr; <code>DELIVERED</code>).</li>
+        <li><strong>View order history:</strong> Chronological order logs with item breakdown, pricing, timestamps, and order detail drill-downs.</li>
+        <li><strong>Manage profile and addresses:</strong> Profile editing and address book with "+ Add New Address" modal and default selection.</li>
+      </ul>
+
+      <div class="block-subtitle">Step-by-Step Test Procedure:</div>
+      <div class="test-steps-box">
+        <div class="step-item">
+          <div class="step-title">1. Test Authentication:</div>
+          <div class="step-instruction">Log in on Web (<code>http://localhost:3000/login</code>) or open Mobile App &rarr; Account tab &rarr; tap "Customer" in 1-Tap Demo Switcher.</div>
+          <div class="expected-result">✔ Successfully logged in. Customer profile and active delivery address are displayed.</div>
+        </div>
+        <div class="step-item">
+          <div class="step-title">2. Browse Categories & Products:</div>
+          <div class="step-instruction">Tap category chips (<em>Dairy & Eggs</em>, <em>Fruits & Vegetables</em>). Observe product listing.</div>
+          <div class="expected-result">✔ Catalog updates instantly to show products in the selected category with shelf-life badges.</div>
+        </div>
+        <div class="step-item">
+          <div class="step-title">3. Test Search & Filter:</div>
+          <div class="step-instruction">Type "Milk" or "Apple" in the search bar.</div>
+          <div class="expected-result">✔ Products filter in real-time matching the query string.</div>
+        </div>
+        <div class="step-item">
+          <div class="step-title">4. Test Cart & Wishlist:</div>
+          <div class="step-instruction">Tap the heart icon on any product (adds to Wishlist). Tap "ADD" on 2 products &rarr; go to Cart tab &rarr; increment and decrement quantities.</div>
+          <div class="expected-result">✔ Subtotal, delivery fee (₹20), and final amount calculate accurately.</div>
+        </div>
+        <div class="step-item">
+          <div class="step-title">5. Place Order & Checkout:</div>
+          <div class="step-instruction">In Cart, tap "Proceed to Checkout" &rarr; select delivery address &rarr; choose payment method &rarr; tap "Pay & Place Order".</div>
+          <div class="expected-result">✔ Order Success screen loads showing unique order ID (e.g. <code>PP-100914</code>).</div>
+        </div>
+        <div class="step-item">
+          <div class="step-title">6. Track Order Status:</div>
+          <div class="step-instruction">Tap "Track Order" or go to Account &rarr; My Orders & Invoices &rarr; tap on the new order.</div>
+          <div class="expected-result">✔ Live timeline renders with active status highlighted.</div>
+        </div>
+        <div class="step-item">
+          <div class="step-title">7. Manage Addresses:</div>
+          <div class="step-instruction">Go to Account &rarr; Saved Delivery Addresses &rarr; tap "+ Add New Address" &rarr; fill in details and save.</div>
+          <div class="expected-result">✔ New address appears in the list and can be selected as primary.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- MODULE 2 -->
+    <div class="module-card">
+      <div class="module-card-header">
+        <div class="module-title">Module 2: Admin Module</div>
+        <span class="module-badge badge-purple">Fulfilled & Verified</span>
+      </div>
+
+      <div class="block-subtitle">Architecture & Implementation:</div>
+      <ul class="fulfillment-list">
+        <li><strong>Secure admin login:</strong> Role-based access control checking <code>role === 'ADMIN'</code>. Non-admin users are rejected. Offline fallback support ensures uninterrupted portal access.</li>
+        <li><strong>Manage product categories:</strong> Full category CRUD via <code>/api/categories</code> with icons, banner images, and descriptions.</li>
+        <li><strong>Add, update, and delete products:</strong> Product catalog management via <code>/api/products</code> with SKU, shelf-life days, brand, stock, and pricing.</li>
+        <li><strong>Manage inventory and stock:</strong> Dedicated inventory view (<code>/api/inventory</code>) with threshold alerts for items with <code>stock &lt; 10</code>.</li>
+        <li><strong>View and process customer orders:</strong> Order dispatch console allowing status transitions (<code>CONFIRMED</code>, <code>DISPATCHED</code>, <code>CANCELLED</code>).</li>
+        <li><strong>Manage customers and delivery partners:</strong> User directory with role filters and account activation/deactivation toggles.</li>
+        <li><strong>Generate reports and monitor sales:</strong> Analytics dashboard showing Total Revenue, Today's Orders, Low Stock Items, Expiring Soon alerts, and sales trend graphs.</li>
+      </ul>
+
+      <div class="block-subtitle">Step-by-Step Test Procedure:</div>
+      <div class="test-steps-box">
+        <div class="step-item">
+          <div class="step-title">1. Admin Authentication:</div>
+          <div class="step-instruction">Open <code>http://localhost:3002</code> &rarr; Enter <code>admin@example.com</code> / <code>password123</code> &rarr; Click "Sign In to Dashboard".</div>
+          <div class="expected-result">✔ Dashboard opens displaying live metrics and sales analytics.</div>
+        </div>
+        <div class="step-item">
+          <div class="step-title">2. Category Management:</div>
+          <div class="step-instruction">Click "Categories" in sidebar &rarr; Click "+ Add Category" &rarr; Enter name & description &rarr; Save.</div>
+          <div class="expected-result">✔ New category appears in the list and updates the catalog.</div>
+        </div>
+        <div class="step-item">
+          <div class="step-title">3. Product Catalog Management:</div>
+          <div class="step-instruction">Click "Products" &rarr; Click "+ Add New Product" &rarr; Enter title, price, category, and <strong>Shelf Life (Days)</strong> &rarr; Save.</div>
+          <div class="expected-result">✔ Product is published and immediately available in customer apps.</div>
+        </div>
+        <div class="step-item">
+          <div class="step-title">4. Inventory & Low Stock Alerts:</div>
+          <div class="step-instruction">Click "Inventory" &rarr; Locate an item marked with <code>LOW STOCK</code> &rarr; Click "Adjust Stock" and increase quantity.</div>
+          <div class="expected-result">✔ Stock updates and low-stock warning badge automatically clears.</div>
+        </div>
+        <div class="step-item">
+          <div class="step-title">5. Process Customer Orders:</div>
+          <div class="step-instruction">Click "Orders" &rarr; Select a <code>PLACED</code> order &rarr; Update status to <code>CONFIRMED</code> or <code>DISPATCHED</code>.</div>
+          <div class="expected-result">✔ Order status updates across both Customer and Delivery Partner apps.</div>
+        </div>
+        <div class="step-item">
+          <div class="step-title">6. User Management:</div>
+          <div class="step-instruction">Click "Users" &rarr; Filter by Customer or Delivery Partner &rarr; Click "Toggle Status".</div>
+          <div class="expected-result">✔ User status flips between Active and Inactive.</div>
+        </div>
+        <div class="step-item">
+          <div class="step-title">7. Sales Reports:</div>
+          <div class="step-instruction">Click "Reports" in sidebar to review revenue breakdowns and order volume trends.</div>
+          <div class="expected-result">✔ Charts render financial statistics and order fulfillment metrics.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- MODULE 3 -->
+    <div class="module-card">
+      <div class="module-card-header">
+        <div class="module-title">Module 3: Delivery Partner Module</div>
+        <span class="module-badge badge-amber">Fulfilled & Verified Live</span>
+      </div>
+
+      <div class="block-subtitle">Architecture & Implementation:</div>
+      <ul class="fulfillment-list">
+        <li><strong>Delivery partner login:</strong> Dedicated portal and mobile authentication mode for delivery agents.</li>
+        <li><strong>View assigned orders:</strong> Real-time queue displaying customer details, delivery location, phone number, and package items.</li>
+        <li><strong>Accept or reject delivery requests:</strong> Interactive action buttons allowing drivers to accept new requests or decline them to release back into the regional pool.</li>
+        <li><strong>Navigate to customer location:</strong> Integrated <code>🗺️ Navigate to Customer Location</code> deep-link opening Google Maps coordinates with one click.</li>
+        <li><strong>Update delivery status:</strong> Sequential state machine transitions (<code>📦 Order Picked Up from Hub</code> &rarr; <code>🛵 Out for Delivery</code> &rarr; <code>✓ Complete Delivery</code>).</li>
+        <li><strong>View delivery history:</strong> Dedicated "Delivery History" tab showing completed orders, trip fees (₹45.00/trip), and Smart Expiry synchronization confirmation.</li>
+      </ul>
+
+      <div class="block-subtitle">Step-by-Step Test Procedure:</div>
+      <div class="test-steps-box">
+        <div class="step-item">
+          <div class="step-title">1. Delivery Partner Login:</div>
+          <div class="step-instruction">On Mobile: Go to Account &rarr; tap "Delivery" in 1-Tap Switcher &rarr; tap "Delivery Partner Portal" (or visit <code>http://localhost:3001</code>).</div>
+          <div class="expected-result">✔ Delivery Partner Portal opens with "Status: Active & Online 🟢".</div>
+        </div>
+        <div class="step-item">
+          <div class="step-title">2. View Assigned Orders:</div>
+          <div class="step-instruction">Ensure "Active Deliveries" tab is selected.</div>
+          <div class="expected-result">✔ Order card displays order number (e.g. <code>#R_100914</code>), customer name, address, and items.</div>
+        </div>
+        <div class="step-item">
+          <div class="step-title">3. Customer Navigation & Contact:</div>
+          <div class="step-instruction">Tap "🗺️ Navigate to Customer Location" &rarr; Verify Google Maps deep-link. Tap "📞 Call" &rarr; opens phone dialer.</div>
+          <div class="expected-result">✔ External navigation opens with exact customer coordinates.</div>
+        </div>
+        <div class="step-item">
+          <div class="step-title">4. Status Transitions:</div>
+          <div class="step-instruction">Tap "📦 Order Picked Up from Hub" &rarr; then tap "🛵 Out for Delivery" &rarr; finally tap "✓ Complete Delivery".</div>
+          <div class="expected-result">✔ Confirmation dialog indicates "Status Updated to DELIVERED". Order moves to Delivery History.</div>
+        </div>
+        <div class="step-item">
+          <div class="step-title">5. View Delivery History:</div>
+          <div class="step-instruction">Tap the "Delivery History" tab pill.</div>
+          <div class="expected-result">✔ Completed orders appear showing DELIVERED badge, Trip Fee: ₹45.00, and notice: Successfully Delivered & Synced with Customer's Smart Expiry.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- MODULE 4 -->
+    <div class="module-card">
+      <div class="module-card-header">
+        <div class="module-title">Module 4: Payment Module</div>
+        <span class="module-badge badge-blue">Fulfilled & Verified</span>
+      </div>
+
+      <div class="block-subtitle">Architecture & Implementation:</div>
+      <ul class="fulfillment-list">
+        <li><strong>Secure online payment integration:</strong> Simulated Razorpay payment gateway integration on mobile and web (<code>/api/payments/verify</code>).</li>
+        <li><strong>Multiple payment options:</strong> Full support for <strong>UPI</strong> (Google Pay, PhonePe, Paytm, BHIM), <strong>Credit/Debit Cards</strong>, <strong>Net Banking</strong>, and <strong>Cash on Delivery (COD)</strong>.</li>
+        <li><strong>Payment confirmation & transaction history:</strong> Instant payment verification callbacks, unique transaction IDs (<code>txn_XXXXXX</code>), payment status badges (<code>PAID</code>, <code>PENDING</code>), and receipts on invoices.</li>
+      </ul>
+
+      <div class="block-subtitle">Step-by-Step Test Procedure:</div>
+      <div class="test-steps-box">
+        <div class="step-item">
+          <div class="step-title">1. Test Payment Method Selection:</div>
+          <div class="step-instruction">In Cart, tap "Proceed to Checkout". Under "Payment Method", test selecting between UPI, Card, Net Banking, and COD.</div>
+          <div class="expected-result">✔ Radio indicator updates to reflect the active payment mode.</div>
+        </div>
+        <div class="step-item">
+          <div class="step-title">2. Process Online Payment:</div>
+          <div class="step-instruction">Select "Razorpay / UPI" and tap "Pay & Place Order".</div>
+          <div class="expected-result">✔ Gateway verifies payment, status transitions to `PAID`, and confirmation screen displays green `PAID` badge.</div>
+        </div>
+        <div class="step-item">
+          <div class="step-title">3. Verify Transaction Record:</div>
+          <div class="step-instruction">Open order details &rarr; tap "View Tax Invoice".</div>
+          <div class="expected-result">✔ Invoice displays Payment Mode (e.g. <code>RAZORPAY_UPI</code>), Subtotal, Taxes, and Total Paid.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- MODULE 5 -->
+    <div class="module-card">
+      <div class="module-card-header">
+        <div class="module-title">Module 5: Notification Module</div>
+        <span class="module-badge badge-primary">Fulfilled & Verified</span>
+      </div>
+
+      <div class="block-subtitle">Architecture & Implementation:</div>
+      <ul class="fulfillment-list">
+        <li><strong>Order confirmation notifications:</strong> Auto-dispatched when checkout completes (<code>type: 'ORDER'</code>).</li>
+        <li><strong>Payment status updates:</strong> Triggered upon payment verification (<code>type: 'PAYMENT'</code>).</li>
+        <li><strong>Delivery status notifications:</strong> Generated when orders transition to <code>PICKED_UP</code>, <code>OUT_FOR_DELIVERY</code>, or <code>DELIVERED</code> (<code>type: 'DELIVERY'</code>).</li>
+        <li><strong>Promotional offers & discounts:</strong> Promotional announcements and seasonal discount alerts (<code>type: 'PROMO'</code>).</li>
+        <li><strong>Expiry reminder notifications:</strong> Dispatched by the Smart Expiry engine when items have &le; 2 days of shelf life remaining (<code>type: 'EXPIRY'</code>).</li>
+      </ul>
+
+      <div class="block-subtitle">Step-by-Step Test Procedure:</div>
+      <div class="test-steps-box">
+        <div class="step-item">
+          <div class="step-title">1. View Notifications:</div>
+          <div class="step-instruction">Tap the Notification Bell icon in the top navigation bar.</div>
+          <div class="expected-result">✔ Notifications list displays all alert categories with distinct icons.</div>
+        </div>
+        <div class="step-item">
+          <div class="step-title">2. Verify Real-Time Alerts:</div>
+          <div class="step-instruction">Place a new order &rarr; Return to Notifications.</div>
+          <div class="expected-result">✔ New notification appears: "Order Placed Successfully! Your order has been received."</div>
+        </div>
+        <div class="step-item">
+          <div class="step-title">3. Test Mark as Read:</div>
+          <div class="step-instruction">Tap on an unread alert or tap "Mark All as Read".</div>
+          <div class="expected-result">✔ Unread badge count clears to 0.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- MODULE 6 -->
+    <div class="module-card">
+      <div class="module-card-header">
+        <div class="module-title">Module 6: Order Management Module</div>
+        <span class="module-badge badge-primary">Fulfilled & Verified Live</span>
+      </div>
+
+      <div class="block-subtitle">Architecture & Implementation:</div>
+      <ul class="fulfillment-list">
+        <li><strong>Order placement and confirmation:</strong> Multi-item checkout generating structured orders with line items, prices, shipping address, and unique <code>PP-XXXXXX</code> order ID.</li>
+        <li><strong>Order cancellation (before dispatch):</strong> Customer-facing "Cancel Order" action enabled while the order is in <code>PLACED</code> or <code>CONFIRMED</code> status. Once dispatched/delivered, cancellation is safely locked.</li>
+        <li><strong>Order tracking:</strong> Visual vertical tracking timeline with active status pulses.</li>
+        <li><strong>Invoice generation:</strong> Formatted GST tax invoice modal showing itemized breakdown, tax rates, business details, customer address, and print/download action.</li>
+        <li><strong>Order history management:</strong> Full order archive allowing customers to review past orders, items ordered, and re-download invoices.</li>
+      </ul>
+
+      <div class="block-subtitle">Step-by-Step Test Procedure:</div>
+      <div class="test-steps-box">
+        <div class="step-item">
+          <div class="step-title">1. Test Order Cancellation (Before Dispatch):</div>
+          <div class="step-instruction">Place an order &rarr; go to Account &rarr; My Orders & Invoices &rarr; tap on the order &rarr; tap red "Cancel Order" button &rarr; confirm.</div>
+          <div class="expected-result">✔ Order status updates immediately to CANCELLED with red badge.</div>
+        </div>
+        <div class="step-item">
+          <div class="step-title">2. Test Cancellation Lock (After Dispatch):</div>
+          <div class="step-instruction">View an order in <code>OUT_FOR_DELIVERY</code> or <code>DELIVERED</code> status.</div>
+          <div class="expected-result">✔ "Cancel Order" button is hidden/disabled since the order is already in transit.</div>
+        </div>
+        <div class="step-item">
+          <div class="step-title">3. View & Print Tax Invoice:</div>
+          <div class="step-instruction">Open any completed order &rarr; tap "📄 View Tax Invoice".</div>
+          <div class="expected-result">✔ Formatted invoice modal renders with GST number, billing address, line items, and Download button.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- MODULE 7 -->
+    <div class="module-card">
+      <div class="module-card-header">
+        <div class="module-title">Module 7: Smart Expiry Reminder Module</div>
+        <span class="module-badge badge-primary">Fulfilled & Verified Live</span>
+      </div>
+
+      <div class="block-subtitle">Architecture & Implementation:</div>
+      <ul class="fulfillment-list">
+        <li><strong>Automatic purchase synchronization:</strong> Completed grocery orders automatically transfer items into the user's Smart Expiry tracker with calculated shelf lives.</li>
+        <li><strong>Estimated expiry dates calculation:</strong> Category-based shelf life engine (Milk = 5 days, Bread = 7 days, Eggs = 21 days, Apples = 14 days) automatically computes <code>estimatedExpiryDate = purchaseDate + shelfLifeDays</code>.</li>
+        <li><strong>Send reminder notifications:</strong> Background midnight cron job checks database daily and sends high-priority notifications for items expiring within 48 hours.</li>
+        <li><strong>Display Fresh, Expiring Soon, and Expired products:</strong>
+          <ul>
+            <li>🟢 <strong>Fresh</strong> (&ge; 3 days remaining)</li>
+            <li>🟡 <strong>Expiring Soon</strong> (1 - 2 days remaining)</li>
+            <li>🔴 <strong>Expired</strong> (&le; 0 days remaining)</li>
+          </ul>
+        </li>
+        <li><strong>Food waste reduction analytics:</strong> Live waste reduction metrics ("85% Waste Prevented", "₹640 Saved") and recipe suggestions for items expiring soon.</li>
+        <li><strong>Expiry history logs:</strong> Historical records of consumed, expired, and discarded items preserved in database (<code>/api/expiry/history</code>).</li>
+        <li><strong>Household grocery inventory management:</strong> Dedicated <strong>Household Pantry</strong> tab with custom item addition, storage zones (<strong>Fridge</strong>, <strong>Pantry</strong>, <strong>Freezer</strong>), and "Mark as Consumed" actions.</li>
+      </ul>
+
+      <div class="block-subtitle">Step-by-Step Test Procedure:</div>
+      <div class="test-steps-box">
+        <div class="step-item">
+          <div class="step-title">1. Test Automatic Purchase Sync:</div>
+          <div class="step-instruction">Place an order containing Milk and Eggs &rarr; open the "Expiry Tracker" tab.</div>
+          <div class="expected-result">✔ Milk (5d shelf life) and Eggs (21d shelf life) appear with countdown timers.</div>
+        </div>
+        <div class="step-item">
+          <div class="step-title">2. Test Status Classification Tabs:</div>
+          <div class="step-instruction">Tap the filter pills: "Fresh", "Expiring Soon", and "Expired".</div>
+          <div class="expected-result">✔ Items are correctly segmented by days remaining with green, yellow, and red badges.</div>
+        </div>
+        <div class="step-item">
+          <div class="step-title">3. Test Household Pantry Manual Addition:</div>
+          <div class="step-instruction">Tap "Pantry" tab &rarr; tap "+ Add Pantry Item" &rarr; enter "Greek Yogurt", shelf life 4 days, storage "Fridge" &rarr; save.</div>
+          <div class="expected-result">✔ Item is added to household pantry and synchronized with Expiry Tracker.</div>
+        </div>
+        <div class="step-item">
+          <div class="step-title">4. Test Storage Zones:</div>
+          <div class="step-instruction">Switch between Fridge, Pantry, and Freezer storage filter pills.</div>
+          <div class="expected-result">✔ Only items stored in that physical kitchen location are displayed.</div>
+        </div>
+        <div class="step-item">
+          <div class="step-title">5. Test Consume & Waste Reduction:</div>
+          <div class="step-instruction">Tap "✓ Used / Consumed" on an item.</div>
+          <div class="expected-result">✔ Item moves to consumed history and waste reduction savings metric increments.</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="page-break"></div>
+
+    <!-- SUMMARY CHECKLIST -->
+    <h2 class="section-header">📋 Complete Verification Summary Checklist</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Module Number & Name</th>
+          <th>Requirements Status</th>
+          <th>Zero-API Offline Fallback</th>
+          <th>Live Verified Surfaces</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Module 1: Customer Module</strong></td>
+          <td><span class="pill-green">100% Complete</span></td>
+          <td>✔ Yes (AsyncStorage mock store)</td>
+          <td>Mobile App & Web (<code>:3000</code>)</td>
+        </tr>
+        <tr>
+          <td><strong>Module 2: Admin Module</strong></td>
+          <td><span class="pill-green">100% Complete</span></td>
+          <td>✔ Yes (Local Admin session)</td>
+          <td>Web Admin Panel (<code>:3002</code>)</td>
+        </tr>
+        <tr>
+          <td><strong>Module 3: Delivery Partner Module</strong></td>
+          <td><span class="pill-green">100% Complete</span></td>
+          <td>✔ Yes (Offline dispatch pool)</td>
+          <td>Mobile App & Web (<code>:3001</code>)</td>
+        </tr>
+        <tr>
+          <td><strong>Module 4: Payment Module</strong></td>
+          <td><span class="pill-green">100% Complete</span></td>
+          <td>✔ Yes (Simulated verification)</td>
+          <td>Mobile & Web Checkout</td>
+        </tr>
+        <tr>
+          <td><strong>Module 5: Notification Module</strong></td>
+          <td><span class="pill-green">100% Complete</span></td>
+          <td>✔ Yes (Local alerts store)</td>
+          <td>Mobile App & Web Navbar</td>
+        </tr>
+        <tr>
+          <td><strong>Module 6: Order Management Module</strong></td>
+          <td><span class="pill-green">100% Complete</span></td>
+          <td>✔ Yes (Local order store & invoice)</td>
+          <td>Mobile App & Web Orders</td>
+        </tr>
+        <tr>
+          <td><strong>Module 7: Smart Expiry Reminder Module</strong></td>
+          <td><span class="pill-green">100% Complete</span></td>
+          <td>✔ Yes (Local shelf-life engine)</td>
+          <td>Mobile Expiry & Pantry Tabs</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="footer">
+      PantryPal &bull; Complete System Specification & Test Verification Manual &bull; Generated October 2026
+    </div>
+
+  </div>
+</body>
+</html>
