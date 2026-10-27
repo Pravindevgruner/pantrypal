@@ -27,7 +27,14 @@ export const authAPI = {
 export const adminAPI = {
   getDashboard: () => api.get('/admin/dashboard'),
   getUsers: (params) => api.get('/admin/users', { params }),
+  createDeliveryPartner: (data) => api.post('/admin/users/delivery-partner', data),
   updateUserStatus: (id, isActive) => api.put(`/admin/users/${id}/status`, { isActive }),
+  updateUserRole: (id, role) => api.put(`/admin/users/${id}/role`, { role }),
+  deleteUser: (id) => api.delete(`/admin/users/${id}`),
+  getAllExpiry: (params) => api.get('/admin/expiry/all', { params }),
+  triggerExpiryScan: () => api.post('/admin/expiry/scan'),
+  bulkRestock: (data) => api.post('/admin/inventory/bulk-restock', data),
+  simulateOrder: () => api.post('/admin/simulate-order'),
   getReports: () => api.get('/admin/reports'),
 };
 
@@ -40,6 +47,7 @@ export const categoryAPI = {
 
 export const productAPI = {
   getProducts: (params) => api.get('/products', { params }),
+  getProductById: (id) => api.get(`/products/${id}`),
   createProduct: (data) => api.post('/products', data),
   updateProduct: (id, data) => api.put(`/products/${id}`, data),
   deleteProduct: (id) => api.delete(`/products/${id}`),
@@ -53,5 +61,8 @@ export const inventoryAPI = {
 
 export const orderAPI = {
   getAllOrders: (params) => api.get('/orders/admin/all', { params }),
+  getOrderById: (id) => api.get(`/orders/${id}`),
   updateOrderStatus: (id, data) => api.put(`/orders/${id}/status`, data),
+  getOrderInvoice: (id) => api.get(`/orders/${id}/invoice`),
+  deleteOrder: (id) => api.delete(`/orders/${id}`),
 };

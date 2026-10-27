@@ -275,10 +275,15 @@ const getAllOrders = async (req, res) => {
 const updateOrderStatus = async (req, res) => {
   try {
     const { id } = req.params;
-    const { status, note, deliveryPartnerId } = req.body;
+    const { status, note, deliveryPartnerId, paymentStatus } = req.body;
 
     const order = await Order.findById(id);
     if (!order) return sendError(res, 'Order not found', {}, 404);
+
+    if (paymentStatus) {
+      order.paymentStatus = paymentStatus;
+      order.timeline.push({ status: order.orderStatus, note: `Payment status marked as ${paymentStatus}` });
+    }
 
     if (status) {
       order.orderStatus = status;
@@ -296,6 +301,14 @@ const updateOrderStatus = async (req, res) => {
           type: 'ORDER',
           referenceId: order._id.toString(),
         });
+      }
+
+      if (status === 'CANCELLED') {
+        // Restock inventory on cancellation
+        for (const item of order.items) {
+          await Product.findByIdAndUpdate(item.product, { $inc: { stockQuantity: item.quantity } });
+          await Inventory.findOneAndUpdate({ product: item.product }, { $inc: { currentQuantity: item.quantity } });
+        }
       }
     }
 
@@ -410,6 +423,17 @@ const getOrderInvoice = async (req, res) => {
   }
 };
 
+const deleteOrder = async (req, res) => {
+  try {
+    const order = await Order.findByIdAndDelete(req.params.id);
+    if (!order) return sendError(res, 'Order not found', {}, 404);
+
+    return sendSuccess(res, 'Order deleted successfully', { orderId: req.params.id });
+  } catch (error) {
+    return sendError(res, error.message, {}, 500);
+  }
+};
+
 module.exports = {
   createOrder,
   getCustomerOrders,
@@ -418,4 +442,5 @@ module.exports = {
   getAllOrders,
   updateOrderStatus,
   getOrderInvoice,
+  deleteOrder,
 };
