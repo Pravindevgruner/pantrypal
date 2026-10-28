@@ -4,12 +4,12 @@
   "requiresCompatibilities": ["FARGATE"],
   "cpu": "512",
   "memory": "1024",
-  "executionRoleArn": "arn:aws:iam::<AWS_ACCOUNT_ID>:role/ecsTaskExecutionRole",
-  "taskRoleArn": "arn:aws:iam::<AWS_ACCOUNT_ID>:role/ecsTaskRole",
+  "executionRoleArn": "arn:aws:iam::526860034396:role/ecsTaskExecutionRole",
+  "taskRoleArn": "arn:aws:iam::526860034396:role/ecsTaskRole",
   "containerDefinitions": [
     {
       "name": "pantrypal-api",
-      "image": "<AWS_ACCOUNT_ID>.dkr.ecr.ap-south-1.amazonaws.com/pantrypal-backend:latest",
+      "image": "526860034396.dkr.ecr.ap-south-1.amazonaws.com/pantrypal-backend:latest",
       "essential": true,
       "portMappings": [
         {
@@ -28,23 +28,19 @@
       "secrets": [
         {
           "name": "MONGODB_URI",
-          "valueFrom": "arn:aws:secretsmanager:ap-south-1:<AWS_ACCOUNT_ID>:secret:pantrypal/production:MONGODB_URI::"
+          "valueFrom": "arn:aws:secretsmanager:ap-south-1:526860034396:secret:pantrypal/production:MONGODB_URI::"
         },
         {
           "name": "JWT_SECRET",
-          "valueFrom": "arn:aws:secretsmanager:ap-south-1:<AWS_ACCOUNT_ID>:secret:pantrypal/production:JWT_SECRET::"
+          "valueFrom": "arn:aws:secretsmanager:ap-south-1:526860034396:secret:pantrypal/production:JWT_SECRET::"
         },
         {
           "name": "RAZORPAY_KEY_ID",
-          "valueFrom": "arn:aws:secretsmanager:ap-south-1:<AWS_ACCOUNT_ID>:secret:pantrypal/production:RAZORPAY_KEY_ID::"
+          "valueFrom": "arn:aws:secretsmanager:ap-south-1:526860034396:secret:pantrypal/production:RAZORPAY_KEY_ID::"
         },
         {
           "name": "RAZORPAY_KEY_SECRET",
-          "valueFrom": "arn:aws:secretsmanager:ap-south-1:<AWS_ACCOUNT_ID>:secret:pantrypal/production:RAZORPAY_KEY_SECRET::"
-        },
-        {
-          "name": "FIREBASE_SERVICE_ACCOUNT_PATH",
-          "valueFrom": "arn:aws:secretsmanager:ap-south-1:<AWS_ACCOUNT_ID>:secret:pantrypal/production:FIREBASE_SERVICE_ACCOUNT_PATH::"
+          "valueFrom": "arn:aws:secretsmanager:ap-south-1:526860034396:secret:pantrypal/production:RAZORPAY_KEY_SECRET::"
         }
       ],
       "logConfiguration": {
