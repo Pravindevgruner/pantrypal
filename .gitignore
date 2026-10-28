@@ -27,5 +27,7 @@ yarn-error.log*
 local.properties
 android/local.properties
 Firebase/
-*-firebase-*.json
+*firebase*.json
 pantrypal-*.json
+google-services.json
+scratch/

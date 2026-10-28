@@ -162,23 +162,11 @@ const updateDeliveryStatus = async (req, res) => {
         order.paymentStatus = 'SUCCESSFUL';
         // TRIGGER SMART EXPIRY SYSTEM CREATION
         await createExpiryRecordsForOrder(order);
-
-        await Notification.create({
-          user: order.customer,
-          title: 'Order Delivered! 🎉',
-          message: `Your grocery order #${order.orderNumber} has been delivered. Your Smart Expiry tracker is active!`,
-          type: 'DELIVERY',
-          referenceId: order._id.toString(),
-        });
-      } else {
-        await Notification.create({
-          user: order.customer,
-          title: `Delivery Update: ${status.replace(/_/g, ' ')}`,
-          message: `Your order #${order.orderNumber} is now ${status.replace(/_/g, ' ')}.`,
-          type: 'DELIVERY',
-          referenceId: order._id.toString(),
-        });
       }
+
+      // Dispatch real push & in-app delivery notification via FCM Service
+      const { sendDeliveryStatusUpdate } = require('../services/fcmService');
+      await sendDeliveryStatusUpdate(order.customer, order, status);
 
       await order.save();
     }

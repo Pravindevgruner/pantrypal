@@ -52,14 +52,9 @@ const runExpiryMonitoring = async () => {
             message = `Your ${item.productName} will expire in ${daysRemaining} days.`;
           }
 
-          // Create notification record
-          await Notification.create({
-            user: item.customerId,
-            title,
-            message,
-            type: 'EXPIRY',
-            referenceId: item._id.toString(),
-          });
+          // Send push & in-app notification via FCM Service
+          const { sendExpiryReminder } = require('./fcmService');
+          await sendExpiryReminder(item.customerId, item, daysRemaining);
 
           // Mark reminder as sent
           item.remindersSent.push(t);

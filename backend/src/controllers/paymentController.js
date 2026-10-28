@@ -153,14 +153,9 @@ const verifyPayment = async (req, res) => {
       },
     });
 
-    // Send customer confirmation notification
-    await Notification.create({
-      user: order.customer,
-      title: 'Payment Successful! (₹1 Penny Test) 💳',
-      message: `Your payment of ₹1.00 for grocery order #${order.orderNumber} was verified via Razorpay (${txnId}).`,
-      type: 'PAYMENT',
-      referenceId: order._id.toString(),
-    });
+    // Dispatch real push & in-app payment notification via FCM Service
+    const { sendPaymentStatusUpdate } = require('../services/fcmService');
+    await sendPaymentStatusUpdate(order.customer, order, 'Razorpay (₹1 Penny Test)');
 
     return sendSuccess(res, 'Payment verified successfully (₹1 Penny Test)', {
       payment: paymentRecord,

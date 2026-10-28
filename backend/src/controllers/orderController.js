@@ -7,6 +7,7 @@ const Delivery = require('../models/Delivery');
 const Notification = require('../models/Notification');
 const User = require('../models/User');
 const { createExpiryRecordsForOrder } = require('../services/expiryEngineService');
+const { sendOrderConfirmation, sendDeliveryStatusUpdate } = require('../services/fcmService');
 const { sendSuccess, sendError } = require('../utils/response');
 
 const createOrder = async (req, res) => {
@@ -161,14 +162,8 @@ const createOrder = async (req, res) => {
     // Immediately initialize Smart Expiry records for the purchased groceries
     await createExpiryRecordsForOrder(order);
 
-    // Create Notification
-    await Notification.create({
-      user: req.user._id,
-      title: 'Order Placed Successfully!',
-      message: `Your order #${order.orderNumber} for ₹${order.totalAmount} has been placed. Smart Expiry tracking has been activated for your items!`,
-      type: 'ORDER',
-      referenceId: order._id.toString(),
-    });
+    // Dispatch Order Confirmation push & in-app notification
+    await sendOrderConfirmation(req.user._id, order);
 
     return sendSuccess(res, 'Order created successfully', { order }, 201);
   } catch (error) {
@@ -240,6 +235,9 @@ const cancelOrder = async (req, res) => {
       });
     }
 
+    // Dispatch push & in-app delivery status update
+    await sendDeliveryStatusUpdate(order.customer, order, 'CANCELLED', 'Order cancelled by customer');
+
     return sendSuccess(res, 'Order cancelled successfully', { order });
   } catch (error) {
     return sendError(res, error.message, {}, 500);
@@ -293,15 +291,10 @@ const updateOrderStatus = async (req, res) => {
         order.paymentStatus = 'SUCCESSFUL';
         // TRIGGER SMART EXPIRY ENGINE AUTOMATIC RECORD CREATION
         await createExpiryRecordsForOrder(order);
-
-        await Notification.create({
-          user: order.customer,
-          title: 'Order Delivered!',
-          message: `Your grocery order #${order.orderNumber} has been delivered. Smart Expiry tracking has been activated!`,
-          type: 'ORDER',
-          referenceId: order._id.toString(),
-        });
       }
+
+      // Dispatch FCM Push & in-app notification to customer
+      await sendDeliveryStatusUpdate(order.customer, order, status, note);
 
       if (status === 'CANCELLED') {
         // Restock inventory on cancellation
@@ -336,12 +329,13 @@ const updateOrderStatus = async (req, res) => {
         { upsert: true }
       );
 
-      await Notification.create({
-        user: partner._id,
-        title: 'New Delivery Assigned!',
-        message: `You have been assigned order #${order.orderNumber}`,
+      // Dispatch FCM Push & in-app notification to rider
+      const { sendNotification } = require('../services/fcmService');
+      await sendNotification(partner._id, {
+        title: 'New Delivery Assigned! 🛵',
+        message: `You have been assigned order #${order.orderNumber} for ${order.address?.area || 'Customer destination'}.`,
         type: 'DELIVERY',
-        referenceId: order._id.toString(),
+        referenceId: order._id,
       });
     }
 
