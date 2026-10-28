@@ -93,7 +93,7 @@ Resources:
             Resource: !Sub '${AdminS3Bucket.Arn}/*'
             Condition:
               StringEquals:
-                AWS:SourceArn: !Sub 'arn:aws:cloudfront::${AWS::AccountId}:distribution/${AdminCloudFrontDistribution.Id}'
+                AWS:SourceArn: !Sub 'arn:aws:cloudfront::${AWS::AccountId}:distribution/${AdminCloudFrontDistribution}'
 
 Outputs:
   AdminBucketName:
@@ -105,5 +105,5 @@ Outputs:
     Description: HTTPS URL to access Admin Dashboard on CloudFront
 
   CloudFrontDistributionId:
-    Value: !Ref AdminCloudFrontDistribution.Id
+    Value: !Ref AdminCloudFrontDistribution
     Description: Distribution ID for cache invalidations
