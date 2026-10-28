@@ -6,11 +6,10 @@ import { ShoppingBag, Lock, Mail, ArrowRight, Sparkles } from 'lucide-react';
 export default function Login() {
   const navigate = useNavigate();
   const { login } = useAuth();
-
   const [email, setEmail] = useState('admin@example.com');
   const [password, setPassword] = useState('password123');
   const [loading, setLoading] = useState(false);
-
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);

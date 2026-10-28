@@ -31,8 +31,8 @@ The database comes pre-seeded with 3 active role-based accounts (managed via `ba
 | `JWT_SECRET` | `pantrypal_super_secret_jwt_key_2026_dev_mode` | Secret key used to sign and verify JWT tokens. |
 | `JWT_EXPIRE` | `30d` | Expiration duration for user sessions (e.g., `30d`, `7d`). |
 | `API_BASE_URL` | `http://localhost:5000` | Public root URL for the backend server. |
-| `RAZORPAY_KEY_ID` | `rzp_test_pantrypal123` | Razorpay Key ID for payments and order creation. |
-| `RAZORPAY_KEY_SECRET` | `secret_test_pantrypal456` | Razorpay Key Secret for verifying webhook & HMAC signatures. |
+| `RAZORPAY_KEY_ID` | `rzp_test_TtFSHX84gdLeIO` | Active Razorpay Test Key ID (Configured for ₹1 Penny Test). |
+| `RAZORPAY_KEY_SECRET` | `xDYkr3q4lYzG2RlAR5py5IWr` | Active Razorpay Key Secret for verifying payment HMAC signatures. |
 | `RAZORPAY_WEBHOOK_SECRET` | `webhook_secret_789` | Secret for Razorpay payment webhooks. |
 | `GOOGLE_MAPS_API_KEY` | `AIzaSyPantryPalDemoKeyForMaps123` | Google Maps API key for address geocoding and ETA calculation. |
 | `FIREBASE_PROJECT_ID` | `pantrypal-dev` | Firebase Project ID. |
@@ -47,7 +47,7 @@ The database comes pre-seeded with 3 active role-based accounts (managed via `ba
 | Variable | Default / Development Value | Description |
 | :--- | :--- | :--- |
 | `VITE_API_BASE_URL` | `http://localhost:5000/api` | Backend API URL. In production, set to your production API domain. |
-| `VITE_RAZORPAY_KEY_ID` | `rzp_test_pantrypal123` | Public Razorpay Key ID used by the client-side checkout modal. |
+| `VITE_RAZORPAY_KEY_ID` | `rzp_test_TtFSHX84gdLeIO` | Public Razorpay Key ID used by the client-side checkout modal for ₹1 Penny Test. |
 | `VITE_GOOGLE_MAPS_API_KEY` | `AIzaSyPantryPalDemoKeyForMaps123` | Google Maps JS API key for address auto-complete and pin drop. |
 
 ---

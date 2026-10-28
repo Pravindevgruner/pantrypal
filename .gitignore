@@ -26,3 +26,6 @@ yarn-error.log*
 *.swo
 local.properties
 android/local.properties
+Firebase/
+*-firebase-*.json
+pantrypal-*.json
