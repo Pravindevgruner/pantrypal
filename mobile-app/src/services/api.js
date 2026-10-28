@@ -3,13 +3,18 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 import { mockStorage } from './mockStorage';
 
-// In Android emulator, 10.0.2.2 maps to host machine localhost:5000.
-// On physical Android device or iOS simulator, change to your machine's LAN IP (e.g., http://192.168.1.x:5000/api)
-export const BASE_URL = Platform.OS === 'android' ? 'http://10.0.2.2:5000/api' : 'http://localhost:5000/api';
+// Live AWS Production API URL (AWS Mumbai ap-south-1)
+export const LIVE_AWS_URL = 'http://production-pantrypal-alb-65279938.ap-south-1.elb.amazonaws.com/api';
+export const LOCAL_DEV_URL = Platform.OS === 'android' ? 'http://10.0.2.2:5000/api' : 'http://localhost:5000/api';
+
+// Set to true to consume live AWS API, false for local emulator fallback
+export const USE_AWS_BACKEND = true;
+
+export const BASE_URL = USE_AWS_BACKEND ? LIVE_AWS_URL : LOCAL_DEV_URL;
 
 const api = axios.create({
   baseURL: BASE_URL,
-  timeout: 3000, // Fast 3-second timeout to fall back smoothly if backend is offline
+  timeout: 8000, // 8-second timeout for reliable mobile cloud network requests
   headers: {
     'Content-Type': 'application/json',
   },
