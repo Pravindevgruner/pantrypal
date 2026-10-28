@@ -24,8 +24,24 @@ const adminRoutes = require('./routes/adminRoutes');
 
 const app = express();
 
-// Enable CORS
-app.use(cors({ origin: '*', credentials: true }));
+// Production-ready CORS with environment whitelist
+const allowedOrigins = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(',').map((o) => o.trim())
+  : ['*'];
+
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (e.g. mobile apps, curl, server-to-server)
+      if (!origin || allowedOrigins.includes('*') || allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
+      return callback(new Error(`Origin ${origin} not allowed by CORS policy`));
+    },
+    credentials: true,
+  })
+);
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -50,11 +66,13 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/expiry', expiryRoutes);
 app.use('/api/admin', adminRoutes);
 
-// Base Health Route
+// Base Health Route (Used by AWS Application Load Balancer Target Group)
 app.get('/api/health', (req, res) => {
   res.json({
     status: 'ok',
     service: 'PantryPal Backend API',
+    environment: process.env.NODE_ENV || 'development',
+    uptimeSeconds: Math.floor(process.uptime()),
     timestamp: new Date().toISOString(),
     expiryEngine: 'Active',
   });
@@ -69,15 +87,21 @@ const PORT = process.env.PORT || 5000;
 const startServer = async () => {
   await connectDB();
 
-  // Auto seed if empty database
+  // Controlled database seeding: Only run if empty AND (development mode OR explicitly allowed)
+  const isDev = process.env.NODE_ENV !== 'production';
+  const allowSeed = process.env.ALLOW_SEED === 'true';
   const count = await Product.countDocuments();
-  if (count === 0) {
+  if (count === 0 && (isDev || allowSeed)) {
     console.log('[System] Empty database detected. Auto-running database seeder...');
     await seedDatabase();
   }
 
-  // Initialize Background Expiry Monitoring Job
-  initExpiryCronJob();
+  // Initialize Background Expiry Monitoring Job (Can be disabled if using AWS EventBridge)
+  if (process.env.ENABLE_INTERNAL_CRON !== 'false') {
+    initExpiryCronJob();
+  } else {
+    console.log('[Cron Job] Internal node-cron disabled (Delegated to external scheduler like AWS EventBridge)');
+  }
 
   app.listen(PORT, () => {
     console.log(`\n🚀 PantryPal Backend Server running on port ${PORT}`);

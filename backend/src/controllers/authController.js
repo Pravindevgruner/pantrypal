@@ -2,17 +2,18 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const Cart = require('../models/Cart');
 const Wishlist = require('../models/Wishlist');
+const { getJwtSecret } = require('../middleware/authMiddleware');
 const { sendSuccess, sendError } = require('../utils/response');
 
 const generateToken = (id) => {
-  return jwt.sign({ id }, process.env.JWT_SECRET || 'pantrypal_super_secret_jwt_key_2026_dev_mode', {
+  return jwt.sign({ id }, getJwtSecret(), {
     expiresIn: process.env.JWT_EXPIRE || '30d',
   });
 };
 
 const register = async (req, res) => {
   try {
-    const { name, email, password, phone, role } = req.body;
+    const { name, email, password, phone, role, adminSecret } = req.body;
 
     if (!name || !email || !password) {
       return sendError(res, 'Please provide name, email, and password', {}, 400);
@@ -23,12 +24,24 @@ const register = async (req, res) => {
       return sendError(res, 'User with this email already exists', {}, 400);
     }
 
+    let assignedRole = 'CUSTOMER';
+    if (role === 'DELIVERY_PARTNER') {
+      assignedRole = 'DELIVERY_PARTNER';
+    } else if (role === 'ADMIN') {
+      const expectedSecret = process.env.ADMIN_REGISTER_SECRET;
+      if (expectedSecret && adminSecret === expectedSecret) {
+        assignedRole = 'ADMIN';
+      } else {
+        return sendError(res, 'Administrative registration requires a valid administrative verification secret', {}, 403);
+      }
+    }
+
     const user = await User.create({
       name,
       email,
       password,
       phone: phone || '',
-      role: role && ['CUSTOMER', 'DELIVERY_PARTNER', 'ADMIN'].includes(role) ? role : 'CUSTOMER',
+      role: assignedRole,
     });
 
     // Initialize Cart and Wishlist if Customer
