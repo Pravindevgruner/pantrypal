@@ -7,6 +7,11 @@ Parameters:
     Default: production
     Description: Environment name prefix
 
+  ALBDNSName:
+    Type: String
+    Default: production-pantrypal-alb-65279938.ap-south-1.elb.amazonaws.com
+    Description: DNS Name of the Application Load Balancer to proxy /api requests
+
 Resources:
   # S3 Bucket for Admin Static SPA Build
   AdminS3Bucket:
@@ -51,6 +56,14 @@ Resources:
             DomainName: !GetAtt AdminS3Bucket.RegionalDomainName
             OriginAccessControlId: !GetAtt CloudFrontOAC.Id
             S3OriginConfig: {}
+          - Id: ALBOrigin
+            DomainName: !Ref ALBDNSName
+            CustomOriginConfig:
+              HTTPPort: 80
+              HTTPSPort: 443
+              OriginProtocolPolicy: http-only
+              OriginSSLProtocols:
+                - TLSv1.2
         DefaultCacheBehavior:
           TargetOriginId: S3Origin
           ViewerProtocolPolicy: redirect-to-https
@@ -66,6 +79,23 @@ Resources:
             QueryString: false
             Cookies:
               Forward: none
+        CacheBehaviors:
+          - PathPattern: /api/*
+            TargetOriginId: ALBOrigin
+            ViewerProtocolPolicy: redirect-to-https
+            AllowedMethods:
+              - GET
+              - HEAD
+              - OPTIONS
+              - PUT
+              - POST
+              - PATCH
+              - DELETE
+            CachedMethods:
+              - GET
+              - HEAD
+            CachePolicyId: 4135ea2d-6df8-44a3-9df3-4b5a84be39ad # Managed-CachingDisabled
+            OriginRequestPolicyId: b689b0a8-53d0-40ab-baf2-68738e2966ac # Managed-AllViewerExceptHostHeader
         # Single-Page Application (SPA) Error Responses: Return index.html on deep client-side routes
         CustomErrorResponses:
           - ErrorCode: 403

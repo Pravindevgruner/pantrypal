@@ -41,6 +41,14 @@ const seedDatabase = async () => {
       role: 'CUSTOMER',
     });
 
+    const customer2 = await User.create({
+      name: 'Priya Sharma',
+      email: 'priya@example.com',
+      password: 'password123',
+      phone: '+91 9876543214',
+      role: 'CUSTOMER',
+    });
+
     const deliveryPartner = await User.create({
       name: 'Delivery Partner User',
       email: 'delivery@example.com',
@@ -49,8 +57,18 @@ const seedDatabase = async () => {
       role: 'DELIVERY_PARTNER',
     });
 
+    const deliveryPartner2 = await User.create({
+      name: 'Ramesh Kumar (Speedy)',
+      email: 'ramesh@example.com',
+      password: 'password123',
+      phone: '+91 9876543213',
+      role: 'DELIVERY_PARTNER',
+    });
+
     await Cart.create({ user: customer._id, items: [] });
+    await Cart.create({ user: customer2._id, items: [] });
     await Wishlist.create({ user: customer._id, products: [] });
+    await Wishlist.create({ user: customer2._id, products: [] });
 
     console.log('[Seeder] Creating categories...');
     const categoriesData = [
