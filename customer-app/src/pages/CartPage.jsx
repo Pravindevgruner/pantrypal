@@ -21,7 +21,7 @@ export default function CartPage() {
           onClick={() => navigate('/categories')}
           className="mt-6 bg-emerald-600 text-white text-xs font-bold px-6 py-3 rounded-xl shadow-md hover:bg-emerald-700 transition"
         >
-          Explore Groceries
+          Start Shopping
         </button>
       </div>
     );

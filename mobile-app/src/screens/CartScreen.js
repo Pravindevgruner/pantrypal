@@ -35,6 +35,21 @@ const CartScreen = ({ navigation }) => {
     navigation.navigate('Checkout');
   };
 
+  const handleStartShopping = () => {
+    if (typeof navigation?.jumpTo === 'function') {
+      navigation.jumpTo('CategoriesTab', { selectedCategory: 'ALL' });
+      return;
+    }
+    const parent = navigation?.getParent?.();
+    if (parent && typeof parent.jumpTo === 'function') {
+      parent.jumpTo('CategoriesTab', { selectedCategory: 'ALL' });
+      return;
+    }
+    if (typeof navigation?.navigate === 'function') {
+      navigation.navigate('Categories', { selectedCategory: 'ALL' });
+    }
+  };
+
   return (
     <View style={styles.container}>
       <Header
@@ -57,7 +72,8 @@ const CartScreen = ({ navigation }) => {
           </Text>
           <TouchableOpacity
             style={styles.shopBtn}
-            onPress={() => navigation.navigate('Main')}
+            onPress={handleStartShopping}
+            activeOpacity={0.8}
           >
             <Text style={styles.shopBtnText}>Start Shopping</Text>
           </TouchableOpacity>

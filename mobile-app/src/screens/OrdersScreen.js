@@ -104,7 +104,14 @@ const OrdersScreen = ({ navigation }) => {
               </Text>
               <TouchableOpacity
                 style={styles.shopBtn}
-                onPress={() => navigation.navigate('Main')}
+                onPress={() => {
+                  if (typeof navigation?.jumpTo === 'function') {
+                    navigation.jumpTo('CategoriesTab', { selectedCategory: 'ALL' });
+                  } else {
+                    navigation.navigate('Categories', { selectedCategory: 'ALL' });
+                  }
+                }}
+                activeOpacity={0.8}
               >
                 <Text style={styles.shopBtnText}>Shop Groceries Now</Text>
               </TouchableOpacity>
