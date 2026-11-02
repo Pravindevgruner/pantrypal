@@ -122,9 +122,9 @@ const updateProfile = async (req, res) => {
     const user = await User.findById(req.user._id);
 
     if (name) user.name = name;
-    if (phone) user.phone = phone;
-    if (profileImage) user.profileImage = profileImage;
-    if (fcmToken) user.fcmToken = fcmToken;
+    if (phone !== undefined) user.phone = phone;
+    if (profileImage !== undefined) user.profileImage = profileImage;
+    if (fcmToken !== undefined) user.fcmToken = fcmToken;
 
     await user.save();
 

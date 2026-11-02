@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -22,6 +22,13 @@ const ProfileScreen = ({ navigation }) => {
   const [phone, setPhone] = useState(user?.phone || '');
   const [saving, setSaving] = useState(false);
 
+  useEffect(() => {
+    if (user) {
+      setName(user.name || '');
+      setPhone(user.phone || '');
+    }
+  }, [user]);
+
   const handleLogout = () => {
     Alert.alert('Sign Out', 'Are you sure you want to log out?', [
       { text: 'Cancel', style: 'cancel' },
@@ -43,14 +50,19 @@ const ProfileScreen = ({ navigation }) => {
 
     try {
       setSaving(true);
-      await authAPI.updateProfile({ name, phone });
+      const res = await authAPI.updateProfile({ name: name.trim(), phone: phone.trim() });
+      const updatedUser =
+        res?.data?.data?.user ||
+        res?.data?.user ||
+        { ...user, name: name.trim(), phone: phone.trim() };
+
       if (updateUserData) {
-        updateUserData({ ...user, name, phone });
+        await updateUserData(updatedUser);
       }
       setShowEditModal(false);
       Alert.alert('Success 🎉', 'Profile updated successfully.');
     } catch (err) {
-      Alert.alert('Error', err.response?.data?.message || 'Failed to update profile');
+      Alert.alert('Error', err.response?.data?.message || err.message || 'Failed to update profile');
     } finally {
       setSaving(false);
     }

@@ -129,6 +129,17 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
+  const updateUserData = async (newUserData) => {
+    const updated = { ...user, ...newUserData };
+    setUser(updated);
+    try {
+      await AsyncStorage.setItem('userData', JSON.stringify(updated));
+    } catch (err) {
+      console.warn('Failed to persist updated user to AsyncStorage:', err);
+    }
+    return updated;
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -141,6 +152,7 @@ export const AuthProvider = ({ children }) => {
         register,
         logout,
         setUser,
+        updateUserData,
       }}
     >
       {children}

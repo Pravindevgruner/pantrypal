@@ -22,11 +22,13 @@ export default api;
 export const authAPI = {
   login: (data) => api.post('/auth/login', data),
   getProfile: () => api.get('/auth/profile'),
+  updateProfile: (data) => api.put('/auth/profile', data),
 };
 
 export const adminAPI = {
   getDashboard: () => api.get('/admin/dashboard'),
   getUsers: (params) => api.get('/admin/users', { params }),
+  updateUser: (id, data) => api.put(`/admin/users/${id}`, data),
   createDeliveryPartner: (data) => api.post('/admin/users/delivery-partner', data),
   updateUserStatus: (id, isActive) => api.put(`/admin/users/${id}/status`, { isActive }),
   updateUserRole: (id, role) => api.put(`/admin/users/${id}/role`, { role }),

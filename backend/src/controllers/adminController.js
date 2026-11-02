@@ -242,6 +242,33 @@ const getUsers = async (req, res) => {
   }
 };
 
+const updateUser = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { name, email, phone, role, isActive, profileImage } = req.body;
+
+    const user = await User.findById(id);
+    if (!user) return sendError(res, 'User not found', {}, 404);
+
+    if (name) user.name = name;
+    if (email) user.email = email;
+    if (phone !== undefined) user.phone = phone;
+    if (profileImage !== undefined) user.profileImage = profileImage;
+    if (role && ['CUSTOMER', 'DELIVERY_PARTNER', 'ADMIN'].includes(role)) {
+      user.role = role;
+    }
+    if (typeof isActive === 'boolean') {
+      user.isActive = isActive;
+    }
+
+    await user.save();
+
+    return sendSuccess(res, 'User profile updated successfully', { user });
+  } catch (error) {
+    return sendError(res, error.message, {}, 500);
+  }
+};
+
 const updateUserStatus = async (req, res) => {
   try {
     const { id } = req.params;
@@ -551,6 +578,7 @@ const getReports = async (req, res) => {
 module.exports = {
   getAdminDashboard,
   getUsers,
+  updateUser,
   updateUserStatus,
   updateUserRole,
   createDeliveryPartner,

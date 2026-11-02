@@ -16,6 +16,8 @@ import {
   Mail,
   CheckCircle2,
   Lock,
+  Edit2,
+  Check,
 } from 'lucide-react';
 
 export default function Users() {
@@ -24,6 +26,19 @@ export default function Users() {
   const [filterRole, setFilterRole] = useState('');
   const [searchQuery, setSearchQuery] = useState('');
   const [showAddPartnerModal, setShowAddPartnerModal] = useState(false);
+
+  // Edit user state
+  const [editingUser, setEditingUser] = useState(null);
+  const [editForm, setEditForm] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    role: 'CUSTOMER',
+    profileImage: '',
+  });
+  const [savingUser, setSavingUser] = useState(false);
+  const [editSuccess, setEditSuccess] = useState('');
+  const [editError, setEditError] = useState('');
 
   // Form for creating delivery partner
   const [partnerForm, setPartnerForm] = useState({
@@ -77,6 +92,45 @@ export default function Users() {
       loadUsers();
     } catch (err) {
       alert(err.response?.data?.message || 'Delete failed');
+    }
+  };
+
+  const handleOpenEditUser = (u) => {
+    setEditingUser(u);
+    setEditForm({
+      name: u.name || '',
+      email: u.email || '',
+      phone: u.phone || '',
+      role: u.role || 'CUSTOMER',
+      profileImage: u.profileImage || '',
+    });
+    setEditSuccess('');
+    setEditError('');
+  };
+
+  const handleSaveEditUser = async (e) => {
+    e.preventDefault();
+    if (!editForm.name.trim()) {
+      setEditError('Name is required');
+      return;
+    }
+    setSavingUser(true);
+    setEditSuccess('');
+    setEditError('');
+    try {
+      const res = await adminAPI.updateUser(editingUser._id, editForm);
+      if (res.data.success) {
+        setEditSuccess('User profile updated successfully!');
+        loadUsers();
+        setTimeout(() => {
+          setEditingUser(null);
+          setEditSuccess('');
+        }, 900);
+      }
+    } catch (err) {
+      setEditError(err.response?.data?.message || err.message || 'Update failed');
+    } finally {
+      setSavingUser(false);
     }
   };
 
@@ -266,6 +320,13 @@ export default function Users() {
                     </td>
                     <td className="p-3 text-right space-x-1.5 whitespace-nowrap">
                       <button
+                        onClick={() => handleOpenEditUser(u)}
+                        title="Edit user profile"
+                        className="p-1.5 bg-slate-100 text-slate-600 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition inline-flex"
+                      >
+                        <Edit2 className="w-3.5 h-3.5" />
+                      </button>
+                      <button
                         onClick={() => handleToggleStatus(u._id, u.isActive)}
                         className={`px-3 py-1 rounded-xl text-[11px] font-bold border transition ${
                           u.isActive
@@ -290,6 +351,119 @@ export default function Users() {
           </table>
         </div>
       </main>
+
+      {/* Edit User Profile Modal */}
+      {editingUser && (
+        <div className="fixed inset-0 bg-slate-950/60 backdrop-blur-xs z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl p-6 w-full max-w-md space-y-4 shadow-2xl border border-slate-100 animate-in zoom-in-95 duration-200">
+            <div className="flex justify-between items-center border-b pb-3">
+              <div className="flex items-center space-x-2">
+                <div className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
+                  <Edit2 className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="font-extrabold text-slate-900 text-base">Edit User Profile</h3>
+                  <p className="text-xs text-slate-500">Update account credentials & roles</p>
+                </div>
+              </div>
+              <button onClick={() => setEditingUser(null)} className="text-slate-400 hover:text-slate-600 p-1 rounded-lg">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {editSuccess && (
+              <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold rounded-xl flex items-center">
+                <Check className="w-4 h-4 mr-2 text-emerald-600" />
+                {editSuccess}
+              </div>
+            )}
+
+            {editError && (
+              <div className="p-3 bg-red-50 border border-red-200 text-red-800 text-xs font-bold rounded-xl">
+                {editError}
+              </div>
+            )}
+
+            <form onSubmit={handleSaveEditUser} className="space-y-3.5 text-xs">
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Full Name *</label>
+                <input
+                  type="text"
+                  required
+                  value={editForm.name}
+                  onChange={(e) => setEditForm({ ...editForm, name: e.target.value })}
+                  placeholder="e.g. Ramesh Kumar"
+                  className="w-full bg-slate-50 border p-2.5 rounded-xl font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Email Address *</label>
+                <input
+                  type="email"
+                  required
+                  value={editForm.email}
+                  onChange={(e) => setEditForm({ ...editForm, email: e.target.value })}
+                  placeholder="user@example.com"
+                  className="w-full bg-slate-50 border p-2.5 rounded-xl font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Phone Number</label>
+                <input
+                  type="tel"
+                  value={editForm.phone}
+                  onChange={(e) => setEditForm({ ...editForm, phone: e.target.value })}
+                  placeholder="+91 9876543210"
+                  className="w-full bg-slate-50 border p-2.5 rounded-xl font-semibold focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Platform Role</label>
+                <select
+                  value={editForm.role}
+                  onChange={(e) => setEditForm({ ...editForm, role: e.target.value })}
+                  className="w-full bg-slate-50 border p-2.5 rounded-xl font-bold focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                >
+                  <option value="CUSTOMER">CUSTOMER</option>
+                  <option value="DELIVERY_PARTNER">DELIVERY_PARTNER</option>
+                  <option value="ADMIN">ADMIN</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-700 mb-1">Profile Avatar URL</label>
+                <input
+                  type="url"
+                  value={editForm.profileImage}
+                  onChange={(e) => setEditForm({ ...editForm, profileImage: e.target.value })}
+                  placeholder="https://images.unsplash.com/..."
+                  className="w-full bg-slate-50 border p-2.5 rounded-xl text-slate-600 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                />
+              </div>
+
+              <div className="flex space-x-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setEditingUser(null)}
+                  className="flex-1 py-2.5 border rounded-xl font-bold text-slate-600 hover:bg-slate-100"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingUser}
+                  className="flex-1 py-2.5 bg-emerald-600 text-white font-bold rounded-xl hover:bg-emerald-700 shadow-xs flex items-center justify-center space-x-1.5"
+                >
+                  <span>{savingUser ? 'Saving...' : 'Save Profile Changes'}</span>
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Add Delivery Partner Modal */}
       {showAddPartnerModal && (

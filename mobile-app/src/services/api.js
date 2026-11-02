@@ -3,8 +3,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 import { mockStorage } from './mockStorage';
 
-// Live AWS Production API URL (AWS Mumbai ap-south-1)
-export const LIVE_AWS_URL = 'http://production-pantrypal-alb-65279938.ap-south-1.elb.amazonaws.com/api';
+// Live AWS Production API URL (AWS Mumbai ap-south-1 over CloudFront HTTPS)
+export const LIVE_AWS_URL = 'https://d1kr4ijqv2t0z1.cloudfront.net/api';
 export const LOCAL_DEV_URL = Platform.OS === 'android' ? 'http://10.0.2.2:5000/api' : 'http://localhost:5000/api';
 
 // Set to true to consume live AWS API, false for local emulator fallback
@@ -118,13 +118,16 @@ export const authAPI = {
 
   updateProfile: async (data) => {
     try {
-      return await api.put('/auth/profile', data);
+      const res = await api.put('/auth/profile', data);
+      return res;
     } catch (err) {
+      console.log('[Offline Engine] updateProfile fallback:', err.message);
       return {
         status: 200,
         data: {
           success: true,
-          data,
+          data: { user: data },
+          user: data,
           message: 'Profile updated locally',
         },
       };

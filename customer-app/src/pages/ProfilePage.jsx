@@ -67,14 +67,15 @@ export default function ProfilePage() {
     setSaving(true);
     setMessage('');
     try {
-      const res = await authAPI.updateProfile({ name, phone, profileImage });
-      if (res.data.success) {
-        setUser(res.data.data.user);
+      const res = await authAPI.updateProfile({ name: name.trim(), phone: phone.trim(), profileImage: profileImage.trim() });
+      const updatedUser = res.data?.data?.user || res.data?.user;
+      if (updatedUser) {
+        setUser(updatedUser);
         setMessage('Profile updated successfully!');
         setTimeout(() => setShowEditModal(false), 900);
       }
     } catch (err) {
-      alert(err.response?.data?.message || 'Failed to update profile');
+      alert(err.response?.data?.message || err.message || 'Failed to update profile');
     } finally {
       setSaving(false);
     }

@@ -3,6 +3,7 @@ const router = express.Router();
 const {
   getAdminDashboard,
   getUsers,
+  updateUser,
   updateUserStatus,
   updateUserRole,
   createDeliveryPartner,
@@ -22,6 +23,7 @@ router.use(authorize('ADMIN'));
 router.get('/dashboard', getAdminDashboard);
 router.get('/users', getUsers);
 router.post('/users/delivery-partner', createDeliveryPartner);
+router.put('/users/:id', updateUser);
 router.put('/users/:id/status', updateUserStatus);
 router.put('/users/:id/role', updateUserRole);
 router.delete('/users/:id', deleteUser);
